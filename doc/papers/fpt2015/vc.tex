@@ -1,0 +1,24 @@
+%
+\comment{
+
+1. The selected embedded NoC contains two Virtual Channels, as previous work has shown it improves performance (?) by 30\%
+2. Virtual channels are...
+3. With two virtual channels, data flowing through the packet processor can be sorted into two groups of traffic
+4. This can be useful for establishing a packet priority scheme
+5. Packet priority is prevalent in many different modern network protocols, including VLAN and TCP
+6. Priority packets can have their own reserved VC, while all other traffic is routed through the other VC
+
+}
+%
+
+
+Virtual Channels (VC) in a NoC are separate FIFO buffers located at every router port.
+They allow packets arriving at or being sent along a common physical link to be stored in separate buffers.
+The embedded NoC used in our design employs two VCs, as previous work has shown that NoC congestion is reduced by $\sim$30\% when a second VC is used~\cite{fpl}.
+With two VCs, data flowing through the packet processor can be sorted into two groups of traffic.
+This can be especially useful for establishing a packet priority scheme.
+Packet priority is prevalent in many different modern network protocols, including VLAN and TCP.
+In NoC-PP, one VC can be reserved for packets given priority based on the contents of their headers, while all other traffic is routed along the other VC.
+Thus, priority packets can bypass non-priority packets when the NoC is congested, thereby giving priority packets a faster path through the design.
+
+

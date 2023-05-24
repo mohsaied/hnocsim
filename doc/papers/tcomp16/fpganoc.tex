@@ -1,0 +1,281 @@
+%
+%
+\comment{
+\begin{itemize}
+	\item in cmps where all data are cache lines and there is a limited number of outstanding requests, and incoming data each has a tag to indicate which it is. processors can resolve exactly what to do with this data.
+	\item we want to have streams of data so we can either tag each packet with a order id and add reordering buffers which may be huge and impossible to size, or we can constrain the NoC such that packets always arrive in-order.
+	\item this means that we must use deterministic routing algorithms -- we use dor, and we can use VCs but each message class is limited to using only a single VC.
+	\item give formal notation for the constraint on VCs -- data originating at a src and going to a dest must stay on the same VC.
+	\item an average user should not be aware that the NoC exists: it is simply a portal in which s/he can throw data in and expect it to arrive at the other end.
+	\item usually people don't care how efficiently they are actually using their interconnect resources.
+	\item advanced designers will want to make best use of the NoC bandwidth/power and can therefore optimize the data size before inserting into the NoC and write custom interfaces in which case they would want to know the min flit width and min packet width -- the former is relevant for latency-insensitive and the latter is relevant for latency-sensitive.
+	\item we can use the NoC both in latency-sensitive mode when we establish a permanent channel between two modules (and here we have the advantage of parallel compilation, freedom of placement etc)
+	\item or latency-insensitive mode for everything else when we cannot map communication into non-intersecting paths on the NoC.
+\end{itemize}
+}
+%
+%
+
+%\hl{change this intro: we are no longer talking about just design styles - need to cover constraints and considerations as well}
+
+%Fig.~\ref{classification} shows the two possibilities of synchronous design styles, as well as two communication protocols that are common in FPGA designs.
+%The two design styles are ``latency-insensitive", and ``latency-sensitive".
+%In a latency-insensitive system, the design consists of \textit{patient} modules that can be stalled, thus allowing the interconnect between those modules to have arbitrary delay~\cite{Carloni2002}.
+%Latency-sensitive design, on the other hand, does not tolerate variable latency on its connections, and assumes that its interconnect always has a fixed latency.
+This section discusses conditions that are necessary to \textit{adapt} an embedded NoC to function with FPGA design styles.
+%We are effectively augmenting the FPGA with a wide stallable network of buffered interconnect that can do flexible switching -- how can we best leverage that new interconnection resource for different FPGA design styles such as latency-sensitive and latency-insensitive design?
+
+
+\comment{
+%
+\figvs{1}{classification}{}{Design styles and communication protocols.}
+%
+
+%
+\figvs{1}{sys}{}{Mapping latency-sensitive and latency-insensitive systems onto an embedded NoC. We reserve \textit{Permapaths} on the NoC to guarantee a fixed latency and perfect throughput for a latency-sensitive application. For latency-insensitive systems, modules must be encapsulated with wrappers to add stall functionality.}
+%
+}
+
+
+%
+%----------------------------------------------------------------------------
+\subsection{Latency and Throughput}
+%----------------------------------------------------------------------------
+%
+
+%
+\figvs{1}{zl_latency}{trim = 1.7cm 3.6cm 1.7cm 3.3cm, clip}{Zero-load latency of the embedded NoC (including FabricPorts) at different fabric frequencies. Latency is reported as the number of cycles at each fabric frequency. The number of hops varies from 1 hop (minimum) to 7 hops (maximum -- chip diagonal).}
+%
+
+Fig.~\ref{zl_latency} plots the zero-load latency of the NoC (running at 1.2~GHz) for different fabric frequencies that are typical of FPGAs.
+We measure latency by sending a single 4-flit packet through the FabricPort input$\rightarrow$NoC$\rightarrow$FabricPort output.
+The NoC itself is running at a very fast speed, so even if each NoC hop incurs 4 cycles of NoC clocks, this translates to approximately 1 fabric clock cycle.
+However, the FabricPort latency is a major portion of the total latency of data transfers on the NoC; it accounts for 40\%--85\% of latency in an unloaded embedded NoC.
+The reason for this latency is the flexibility offered by the FabricPort -- we can connect a module of any operating frequency but that incurs TDM, DEMUX and clock-crossing latency.
+%Careful inspection of Fig.~\ref{zl_latency} reveals that the FabricPort input always has a fixed latency for a given frequency, while the latency of the FabricPort output varies by one cycle sometimes -- this is an artifact of having to wait for the \textit{next} fabric (slow) clock cycle on which we can output data in the DEMUX unit.
+\comment{Additionally, the latency of the FabricPort is lowest at 300~MHz.
+This is because 300~MHz is exactly one quarter of the NoC frequency, meaning that the intermediate clock is the same as the NoC clock and the aFIFO reads and writes flits at the same frequency, thus no additional clock-crossing latency is incurred.}
+
+%
+\figvs{0.96}{zl_xput}{trim = 1.5cm 3.7cm 1.5cm 3.45cm, clip}{Zero-load throughput of embedded NoC path between any two nodes, normalized to sent data. A throughput of ``1" is the maximum; it means that we receive $i$ flits per cycle, where $i$ is the number of flits we send each cycle.}
+%
+
+Fig.~\ref{zl_xput} plots the throughput between any source and destination on our NoC in the absence of contention.
+The NoC is running at 1.2~GHz with 1-flit width; therefore, if we send 1 flit each cycle at a frequency lower than 1.2~GHz, our throughput is always perfect -- we'll receive data at the same input rate (one flit per cycle) on the other end of the NoC path.
+The same is true for 2-flits (300 bits) at 600~MHz, 3 flits (450 bits) at 400~MHz or 4 flits (600 bits) at 300~MHz.
+As Fig.~\ref{zl_xput} shows, the NoC can support the mentioned width--frequency combinations because they are different ways to utilize the NoC bandwidth.
+In 28-nm FPGAs, we believe that very few wide datapath designs will run faster than 300~MHz, therefore the NoC is very usable at all its different width options.
+When the width--frequency product exceeds the NoC bandwidth, packet transfers are still correct; however, the throughput degrades and the NoC backpressure stalls the data sender thus reducing throughput as shown in Fig.~\ref{zl_xput}.
+
+%
+%----------------------------------------------------------------------------
+\subsection{Module Connectivity}
+%----------------------------------------------------------------------------
+%
+
+The FabricPort converts 22.5~GB/s of NoC link data bandwidth (150~bits, 1.2~GHz) to 600~bits and any fabric frequency on the fabric side.
+An FPGA designer can then use any fraction of that port width to send data across the NoC.
+However, the smallest NoC unit is the flit; so we can either send 1, 2, 3 or 4 flits each cycle.
+If the designer connects data that fits in one flit (150~bits or less), all the data transported by the NoC is useful data.
+However, if the designer want to send data that fits in one-and-a-half flits (225~bits for example), then the FabricPort will send two flits, and half of the second flit is overhead that adds to power consumption and worsens NoC congestion unnecessarily.
+Efficient ``translator" modules (see Fig.~\ref{fp_logical}) will therefore try to take the flit width into account when injecting data to the NoC.
+
+A limitation of the FabricPort output is observed when connecting two modules.
+Even if each module only uses half the FabricPort's width (2 flits), only one module can receive data each cycle because the DEMUX only outputs one packet at a time by default as Fig.~\ref{demux} shows.
+To overcome this limitation, we create a \textit{combine-data} mode as shown in Fig.~\ref{merge}.
+For this combine-data mode, when there are two modules connected to one FabricPort, data for each module must arrive on a different VC.
+The NoC Reader arbiter must strictly alternate between VCs, and then the DEMUX will be able to group two packets (one from each VC) before data output to the FPGA.
+This allows merging two streams without incurring serialization latency in the FabricPort.
+%
+\begin{cond}
+To combine packets at a FabricPort output, each packet must arrive on a different VC.
+\end{cond}
+%
+Note that we are limited to the merging of 2 packets with 2 VCs because each packet type must have the ability to be independently stalled, and we can only stall an entire VC, not individual flits within a single VC.
+We can merge up to four 1-flit packets if we increase the number of VCs.
+%Previous work has also identified the importance of merge functionality for FPGA applications and proposed creating NoCs out of split-merge primitives~\cite{Kapre2006}.
+
+%
+\figvs{1}{merge}{}{FabricPort output merging two packets from separate VCs in \textit{combine-data} mode, to be able to output data for two modules in the same clock cycle.}
+%
+
+%
+%--------------------------------------------------------------
+\subsection{Packet Ordering}
+%--------------------------------------------------------------
+%
+
+Packet-switched NoCs like the one we are using were originally built for chip multiprocessors (CMPs).
+CMPs only perform \textbf{transaction} communication; most transfers are cache lines or coherency messages.
+Furthermore, processors have built-in mechanisms for reordering received data, and NoCs are typically allowed to reorder packets.
+%do not guarantee that packets will arrive in order.
+
+With FPGAs, transaction communication can be one of two main things: (1) Control data from a soft processor that is low-bandwidth and latency-critical -- a poor target for embedded NoCs, or (2) Communication between design modules and on-chip or off-chip memory, or PCIe links -- high bandwidth data suitable for our proposed NoC.
+Additionally, FPGAs are very good at implementing \textbf{streaming}, or data-flow applications such as packet switching, video processing, compression and encryption.
+These streams of data are also prime targets for using our high-bandwidth embedded NoC.
+Crucially, neither transaction nor streaming applications tolerate packet reordering on FPGAs, nor do FPGAs natively support it.
+While it may be possible to design reordering logic for simple memory-mapped applications, it becomes \textit{impossible} to build such logic for streaming applications without hurting performance -- we therefore choose to restrict the embedded NoC to perform in-order data transfers only.
+Specifically, an NoC is not allowed to reorder packets on a single connection.
+%
+\begin{defn}
+A \textbf{connection} (\textbf{s}, \textbf{d}) exists between a single source (\textbf{s}) and its downstream destination (\textbf{d}) to which it sends data.
+\end{defn}
+%
+\begin{defn}
+A \textbf{path} is the sequence of links from \textbf{s} to \textbf{d} that a flit takes in traversing an NoC.
+\end{defn}
+%
+
+There are two causes of packet reordering.
+Firstly, an adaptive route-selection algorithm would always attempt to choose a path of least contention through the NoC; therefore two packets of the same source and destination (same connection) may take different paths and arrive out of order.
+Secondly, when sending packets (on the same connection) but different VCs, two packets may get reordered even if they are both taking the same path through the NoC.
+
+To solve the first problem, we only use deterministic routing algorithms, such as dimension-ordered routing~\cite{dally_book}, in which paths are the same for all packets that belong to a connection.
+%
+\begin{cond}
+\label{routing_constraint}
+The same \textbf{path} must be taken by all packets that belong to the same \textbf{connection}.
+\end{cond}
+%
+%
+%Deterministic routing algorithms such as dimension-ordered routing~\cite{dally_book} fulfill Condition~\ref{routing_constraint} as they always select the same path for packets on the same connection.
+%
+
+Eliminating VCs altogether would fix the second ordering problem; however, this is not necessary.
+VCs can be used to break message deadlock, merge data streams (Fig.~\ref{merge}), alleviate NoC congestion and may be also used to assign packet priorities thus adding extra configurability to our NoC -- these properties are desirable.
+We therefore impose more specific constraints on VCs such that they may still be used on FPGA NoCs.
+%
+\begin{cond}
+All packets belonging to the same \textbf{connection}, and are of the same message type, must use the same VC.
+\end{cond}
+%
+
+\comment{
+To do this in NoC routers is simple.
+Normally, a packet may change VCs at every router hop -- VC selection is done in a VC allocator~\cite{dally_book}.
+We replace this VC allocator with a lightweight VC \textit{facilitator} that cannot switch a packet between VCs; instead, it inspects a packet's input VC and stalls that packet until the downstream VC buffer is available.
+%At the same time, other connections may use other VCs in that router thus taking advantage of multiple VCs.
+}
+
+%
+%--------------------------------------------------------------
+\subsection{Dependencies and Deadlock}
+%--------------------------------------------------------------
+%
+
+
+Two \textit{message types} may not share a standard FabricPort output (Fig.~\ref{fpout}) if a dependency exists between the two message types.
+An example of dependent message types can be seen in video processing IP cores: both control messages (that configure the IP to the correct resolution for example) and data messages (pixels of a video stream) are received on the same port~\cite{altera_vip}.
+An IP core may not be able to process the data messages correctly until it receives a control message.
+
+
+\begin{figure}[t]
+\centering
+\subfloat[Standard FabricPort output.]{
+   \includegraphics[width=0.9\columnwidth,keepaspectratio]{images/deadlock}
+   \label{deadlock}
+ }
+ \\
+\subfloat[Deadlock-free FabricPort output.]{
+   \includegraphics[width=0.9\columnwidth,keepaspectratio]{images/nodeadlock}
+   \label{nodeadlock}
+ }
+\caption{Deadlock can occur if a dependency exists between two packets going to the same port. By using separate VCs for each message type, deadlock can be broken thus allowing two dependent message types to share a FabricPort output.}
+\label{dead}
+\end{figure}
+
+Consider the deadlock scenario in Fig.~\ref{deadlock}.
+The module is expecting to receive packet 2 but gets packet 1 instead; therefore it stalls the FabricPort output and packet 2 remains queued behind packet 1 forever.
+To avoid this deadlock, we can send each message type on a different VC~\cite{Sorin2011}.
+Additionally, we created a deadlock-free FabricPort output that maintains separate paths for each VC beyond the NoC reader -- this means we duplicate the aFIFO and DEMUX units for each VC we have.
+Each VC now has an independent ``ready" signal, allowing us to stall each VC separately.
+%The module can therefore \textit{either} read from VC0 or VC1.
+Fig.~\ref{nodeadlock} shows that even if there is a dependency between different messages, they can share a FabricPort output provided each uses a different VC.
+
+%
+\begin{cond}
+When multiple message types can be sent to a FabricPort, and a dependency exists between the message types, each type must use a different VC. The number of dependencies must be less than or equal to the number of VCs.
+\end{cond}
+%
+
+\comment{
+%
+%---------------------------------------------------------------------------------------------------------
+\subsection{Latency-Insensitive Design with NoC}
+%---------------------------------------------------------------------------------------------------------
+%
+
+Latency-insensitive design is a design methodology that decouples design modules from their interconnect by forcing each module to be \textit{patient}; that is, to tolerate variable latency on its inputs~\cite{Carloni2002}.
+This is typically done by encapsulating design modules with wrappers that can stall a module until its input data arrives.
+This means that a design remains functionally correct, by construction, regardless of the latency of data arriving at each module.
+The consequence of this latency tolerance is that a CAD tool can automatically add pipeline stages (called \textit{relay stations}) invisibly to the circuit designer, late in the design compilation and thus improve frequency without extra effort from the designer~\cite{Carloni2002}.
+
+Our embedded NoC is effectively a form of latency-insensitive interconnect; it is heavily pipelined and buffered and supports stalling.
+We can therefore leverage such an NoC to interconnect patient modules of a latency-insensitive system.
+Furthermore, we no longer need to add relay stations on connections that are mapped to NoC links, avoiding their overhead.
+We envision a future latency-insensitive design flow targeting embedded NoCs on FPGAs.
+Given a set of modules that make up an application, they would first be encapsulated with wrappers, then mapped onto an NoC such that performance of the system is maximized.
+
+\comment{
+%
+\figvs{0.96}{li_wrappers_overhead}{trim = 1.5cm 3.7cm 1.5cm 3.45cm, clip}{Area and frequency of latency-insensitive wrappers from~\cite{Murray2014} (original), and optimized wrappers that take advantage of NoC buffering (NoC-compatible).}
+%
+
+Previous work that investigated the overhead of latency-insensitive design on FPGAs used FIFOs at the inputs of modules in the stall-wrappers to avoid throughput degradation whenever a stall occurs~\cite{Murray2014}.
+When the interconnect is an embedded NoC; however, we already have sufficient buffering in the NoC itself (and the FabricPorts) to avoid this throughput degradation, thus allowing us to replace this FIFO -- which is a major portion of the wrapper area -- by a single stage of registers.
+We compare the area and frequency of the original latency-insensitive wrappers evaluated in~\cite{Murray2014}, and the NoC-compatible wrappers in Fig.~\ref{li_wrappers_overhead} for wrappers that support one input and one output and a width between 100 bits and 600 bits.
+As Fig.~\ref{li_wrappers_overhead} shows, the lightweight NoC-compatible wrappers are 87\% smaller and 47\% faster.
+}
+}
+
+
+%
+%---------------------------------------------------------------------------------------------------------
+\subsection{Latency-Sensitive Design with NoC (Permapaths)}
+%---------------------------------------------------------------------------------------------------------
+%
+
+%need to introduce latency insensitive design
+Communication over an NoC naturally has variable latency; however, latency-sensitive design requires predictable latency on the connections between modules.
+That means that the interconnect is not allowed to insert/remove any cycles between successive data.
+Prior NoC literature has largely focused on using circuit-switching to achieve quality-of-service guarantees but could only provide a bound on latency rather than a guarantee of fixed latency~\cite{Goossens2005}.
+We analyze the latency and throughput guarantees that can be attained from an NoC, and use those guarantees to determine the conditions under which a latency-sensitive system can be mapped onto a packet-switched embedded NoC.
+Effectively, our methodology creates permanent paths with predictable latencies (Permapaths) on our embedded NoC.
+
+%To ensure that the NoC doesn't stall due to unavailable buffering, we size NoC buffers for maximum throughput, so that we never stall while waiting for backpressure signals within the NoC.
+%This is well-studied in the literature and is done by sizing our router buffers to cover the \textit{credit round-trip latency}~\cite{dally_book} -- for our system, a buffer depth of 10 suffices.
+
+A NoC connection acts as a pipelined wire; the number of pipeline stages are equivalent to the zero-load latency of an NoC path; however, that latency is only incurred once at the very beginning of data transmission after which data arrives on each fabric clock cycle.
+We call this a \textbf{Permapath} through the NoC: a path that is free of contention and has perfect throughput.
+As Fig.~\ref{zl_xput} shows, we can create Permapaths of larger widths provided that the input bandwidth of our connection does not exceed the NoC port bandwidth of 22.5~GB/s.
+This is why throughput is still perfect with 4~flits$\times$300~MHz for instance.
+To create those Permapaths we must therefore ensure two things:
+%
+\begin{cond}
+(Permapaths)
+The sending module data bandwidth must be less than or equal to the maximum FabricPort input bandwidth.
+\end{cond}
+%
+\begin{cond}
+\label{traf_cond}
+(Permapaths)
+No other data traffic may overlap the NoC links reserved for a Permapath to avoid congestion delays on those links.
+\end{cond}
+%
+Condition~\ref{traf_cond} can be determined statically since our routing algorithm is deterministic; therefore, the mapping of modules onto NoC routers is sufficient to identify which NoC links will be used by each module.
+
+One final constraint is necessary to ensure error-free latency-sensitive transfers.
+It pertains to ``clock drift" that occurs between the intermediate clock and the NoC clock -- these are respectively the read and write clocks of the aFIFO in the FaricPort (Fig.~\ref{fabric_port}).
+If these clocks are different, and they drift apart because of their independence, data may not be consistently latched on the same clock edge in synchronizing registers in the aFIFO resulting in a skipped clock edge and variable latency.
+While this doesn't affect overall system throughput by any measurable amount, it may corrupt a latency-sensitive system where the exact number of cycles between data transfers is part of system correctness -- Condition~\ref{clock_cond} circumvents this problem.
+
+%
+\begin{cond}
+\label{clock_cond}
+(Permapaths)
+The intermediate clock period must be an exact multiple of the NoC clock to avoid clock drift and ensure clock edges have a consistent alignment.
+\end{cond}
+%
+
+%
+%

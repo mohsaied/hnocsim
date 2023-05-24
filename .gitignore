@@ -1,0 +1,11 @@
+*~
+\#*#
+._*
+.Apple*
+.DS_Store
+src/work/*
+.*.swp
+*.out
+transcript
+stats.txt
+.so

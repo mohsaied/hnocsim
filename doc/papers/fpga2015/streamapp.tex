@@ -1,0 +1,117 @@
+%
+%
+\comment{
+\begin{itemize}
+	\item look at jpeg compression for instance -- conforms to our constraints for a design that can map latency-sensitively onto the NoC
+	\item establish communication channels and data arrives each cycle -- we don't even need the ready signals
+	\item what advantages does this bring? lets try placing the modules connecting to the routers or connecting together
+	\item how much global interconnect does it save?
+	\item present a simple cad algo to say whether this app can be mapped latency-sensitvely or not? and give candidate solutions if possible
+\end{itemize}
+}
+%---------------------------------------------------------------------------------------------------------------------------------------------------
+
+%
+\figvs{1}{jpeg_app}{}{Single-stream JPEG block diagram.}
+%
+
+We use a streaming JPEG compression design from~\cite{jpeg_opencore}.
+The application consists of three modules as shown in Fig.~\ref{jpeg_app}; discrete cosine transform (DCT), quantizer (QNR) and run-length encoding (RLE).
+The single pipeline shown in Fig.~\ref{jpeg_app} can accept one pixel per cycle and a data strobe that indicates the start of 64 consecutive pixels forming one (8$\times$8) block on which the algorithm operates~\cite{jpeg_opencore}.
+The components of this system are therefore latency-sensitive as they rely on pixels arriving every cycle, and the modules do not respond to backpressure.
+
+We parallelize this application by instantiating multiple (10--40) JPEG pipelines in parallel; which means that the connection width between the DCT, QNR and RLE modules varies between 130~bits and 520~bits.
+Parallel JPEG compression is an important data-center application as multiple images are often required to be compressed at multiple resolutions before being stored in data-center disk drives; the back-end of large social networking websites and search engines.
+We implemented this parallel JPEG application using direct point-to-point links, then mapped the same design to use the embedded NoC between the modules using \textbf{Permapaths} similarly to Fig.~\ref{sys}.
+Using the \texttt{RTL2Booksim} simulator, we connected the JPEG design modules through the FabricPorts to the embedded NoC and verified functional correctness of the NoC-based JPEG.
+Additionally, we verified that throughput (in number of cycles) was the same for both the original and NoC versions; however, there are \til8 wasted cycles (equivalent to the zero-load latency of three hops) at the very beginning in the NoC version while the NoC link pipeline is getting populated with valid output data -- these 8 cycles are of no consequence.
+
+%---------------------------------------------------------------------------------------
+\subsubsection{Frequency}
+%---------------------------------------------------------------------------------------
+
+To model the physical design repercussions (placement, routing, critical path delay) of using an embedded NoC, we emulated embedded NoC routers on FPGAs by creating 16 design partitions in Quartus~II that are of size 7$\times$5$=$35 logic clusters -- each one of those partitions represents an embedded hard NoC router with its FabricPorts and interface to FPGA (see Fig.~\ref{heat_map} for chip plan).
+We then connected the JPEG design modules to this emulated NoC.
+Additionally, we varied the physical location of the QNR and RLE modules (through location constraints) from ``close" together on the FPGA chip to ``far" on opposite ends of the chip.
+Note that the DCT module wasn't placed in a partition as it was a very large module and used most of the FPGA's DSP blocks.
+
+%
+\figvs{1}{jpeg_freq}{trim = 1.5cm 3.7cm 1.5cm 3.45cm, clip}{Frequency of the parallel JPEG compression application with and without an NoC. The plot ``with NoC" is averaged for the two cases when it's ``close" and ``far" with the standard deviation plotted as error bars. Results are averaged over 3 seeds.}
+%
+
+Using location constraints, we investigated the result of a stretched critical path in an FPGA application.
+This could occur if the FPGA is highly utilized and it is difficult for the CAD tools to optimize the critical path as its endpoints are forced to be placed far apart, or when application modules connect to I/O interfaces and are therefore physically constrained far from one another.
+Fig.~\ref{jpeg_freq} plots the frequency of the original parallel JPEG and the NoC version.
+In the ``close" configuration, the  frequency of the original JPEG is higher than that of the NoC version by \til5\%. 
+This is because the JPEG pipeline is well-suited to the FPGA's traditional row/column interconnect.
+With the NoC version, the wide point-to-point links must be connected to the smaller area of 7$\times$5 logic clusters (area of an embedded router); making the placement less regular and on average slightly lengthening the critical path.
+
+%
+\figvs{1}{jpeg_pipes}{trim = 1.5cm 3.3cm 1.5cm 3.77cm, clip}{Frequency of parallel JPEG with 40 streams when we add 1-4 pipeline stages on the critical path. Frequency of the same application when connected to the NoC is plotted for comparison. Results are averaged over 3 seeds.}
+%
+
+The advantage of the NoC is highlighted in the ``far" configuration when the QNR and RLE modules are placed far apart thus stretching the critical path across the chip diagonal.
+In the NoC version, we connect to the closest NoC router as shown in Fig.~\ref{heat_map} -- on average, the frequency improved by \til80\%.
+Whether in the ``far" or ``close" setups, the NoC-version's frequency only varies by \til6\% as the error bars show in Fig.~\ref{jpeg_freq}.
+By relying on the NoC's predictable frequency in connecting modules together, the effects of the FPGA's utilization level and the modules' physical placement constraints become localized to each module instead of being a global effect over the entire design.
+Modules connected through the NoC become timing-independent making for an easier CAD problem and allowing parallel compilation.
+
+
+With additional design effort, a designer of the original (without NoC) system would identify the critical path and attempt to pipeline it so as to improve the design's frequency.
+This design$\rightarrow$compile$\rightarrow$repipeline cycle hurts designer productivity as it can be unpredictable and compilation could take days for a large design~\cite{Murray2014}.
+We plot the frequency of our original JPEG with 40 streams in the ``far" configuration after adding 1, 2, 3, and 4 pipeline registers on the critical path, both with and without register retiming optimizations, and we compare to the NoC version frequency in Fig.~\ref{jpeg_pipes}.
+The plot shows that the frequency of the pipelined version never becomes as good as that of the NoC version even with 4 pipeline stages -- the NoC version is 10\% better than original JPEG with pipelining.
+
+\comment{
+The plot shows two things.
+First, the frequency of the pipelined version never becomes as good as that of the NoC version even with 4 pipeline stages on the critical path -- on average, there is a 10\% difference in frequency.
+Secondly, It doesn't really matter how many pipeline registers we place on the critical path, nor does it matter much whether register retiming is enabled. 
+This is because register retiming occurs before placement and routing in the CAD flow, and therefore has no physical awareness on where the register will actually be placed on the FPGA device.
+}
+
+
+%---------------------------------------------------------------------------------------
+\subsubsection{Interconnect Utilization}
+%---------------------------------------------------------------------------------------
+
+%
+\begin{table}[!t]
+\centering
+\begin{small}
+    \caption{Interconnect utilization for JPEG with 40 streams in ``far" configuration. Relative difference between NoC version and the original version is reported.}
+    \label{wire_util}
+    \begin{tabular}{cccc}
+    \toprule
+    \multicolumn{2}{c}{Interconnect Resource}       & Difference & Geomean \\
+    \midrule
+	\multirow{2}{*}{Short}   & Vertical (C4)         & +13.2\%   & \multirow{2}{*}{+10.2\%} \\
+	                         & Horizontal (R3,R6)   & +7.8\% & \\
+	\midrule
+	\multirow{2}{*}{Long} & Vertical (C14)           & -47.2\% & \multirow{2}{*}{-38.6\%}\\
+	& Horizontal (R24)                              & -31.6\%  & \\
+    \bottomrule
+	\end{tabular}
+    \begin{tabular}{cccc}
+	\multicolumn{4}{c}{Wire naming convention: C=column, R=row, }\\
+	\multicolumn{4}{c}{followed by number of logic clusters of wire length.}\\
+    \end{tabular}
+\end{small}
+\end{table}
+%
+
+Table~\ref{wire_util} quantifies the FPGA interconnect utilization difference for the two versions of 40-stream ``far" JPEG.
+The NoC version reduces long wire utilization by \til40\% but increases short wire utilization by \til10\%.
+Note that long wires are scarce on FPGAs, for the Stratix~V device we use, there are 25\xx more short wires than there are long wires.
+By offloading long connections onto an NoC, we conserve much of the valuable long wires.
+
+%
+\figvs{1}{heat_map}{}{Heat map showing total wire utilization for the NoC version, and only long-wire utilization for the original version of the JPEG application with 40 streams when modules are spaced out in the ``far" configuration. In hot spots, utilization of scarce long wires in the original version goes up to 100\%, while total wire utilization never exceeds 40\% for the NoC version.}
+%
+
+Fig.~\ref{heat_map} shows wire utilization for the two versions of 40-stream ``far" JPEG and highlights that using the NoC does not produce any routing hot spots around the embedded routers.
+As the heat map shows, FPGA interconnect utilization does not exceed 40\% in that case.
+Conversely, the original version utilizes long wires heavily on the long connection between QNR$\rightarrow$RLE, with utilization going up to 100\% in hot spots at the terminals of the long connection as shown in Fig.~\ref{heat_map}.
+
+
+%
+%

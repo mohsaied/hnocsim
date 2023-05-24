@@ -1,0 +1,15 @@
+#!/bin/bash
+
+#########
+#cleanup
+#########
+
+killall booksim
+killall vsim
+killall vsimk
+
+rm -r work
+rm transcript
+rm socket
+rm *.out
+rm *.o *.so *.wlf *.vstf

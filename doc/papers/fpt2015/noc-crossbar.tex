@@ -1,0 +1,39 @@
+%
+\comment{
+
+1. Use the embedded NoC as the crossbar!!!
+2. NoC flow control
+3. NoC characteristics (radix, topology, link width, frequency, BW)
+4. How to use NoC as crossbar
+5. How to connect more than just 16 modules (arbiter design and block diagram)
+
+}
+%
+
+To address this problem, we draw inspiration from previous work that used an embedded NoC in an FPGA as a crossbar for an Ethernet switch~\cite{bitar2014efficient,abdelfattah2015take}.
+This NoC -- described in Section~\ref{sec:noc-fpga} -- can function as the full crossbar in our packet processor design.
+Not only is it already designed to transfer packets across the FPGA, it also includes a built-in flow control mechanism that can handle scenarios of adversarial traffic, such as prolonged bursts of packets.
+For example, if a certain processing module is busy and cannot accept packets from the NoC, the NoC will hold packets destined for that module in a buffer at the connecting router.
+Should that buffer become full, packets will then be buffered at downstream NoC routers.
+If the NoC cannot accept packets at one of its routers due to a buffer being full, then it can also send a backpressure signal to the modules connected to that router.
+
+%\hl{consider removing this text in favour of embedded NoC section}
+%The NoC used in our design is a 16-node mesh with 150b-wide links and capable of running at 1.2 GHz in 28-nm process technology (the same process used for Stratix-V devices).
+With a capacity of 180 Gb/s at each of its links, the NoC can transport high bandwidth data throughout the FPGA, to and from processing modules in our design.
+Processing modules are connected to NoC routers, as illustrated in Figure~\ref{noc-parser-general}, with the NoC's FabricPort used to bridge the frequency of the processing modules and the frequency of the NoC (see Section~\ref{sec:noc-fpga}).
+%In effect, this design uses the embedded NoC to replace the full crossbars in Figure~\ref{high-level-pp}.
+Moreover, we can combine multiple modules at a single router node using the FPGA's soft logic for arbitration.
+For the remainder of the paper, we shall refer to this NoC packet processor as ``NoC-PP''.
+
+%In order to not be limited to a maximum of 16 processing modules, we created arbitration logic to connect multiple modules to a single NoC router (Figure~\ref{arbiter}).
+%To maximize independence between each module connected to the router, FIFO queues were added between each module and the arbitration logic.
+%This allows for each module to independently send and receive backpressure to and from the NoC.
+%The queue depth depends on the number of modules connected and the desired degree of independence between modules.
+
+%
+\figvs{1}{noc-parser-general}{}{The ``NoC-PP'' architecture: the embedded NoC serves as the crossbar for the module-based packet processor design. NoC routers and links are ``hard'', i.e. embedded in the chip, while the processing modules and arbitration logic are synthesized from the FPGA ``soft'' fabric.}
+%
+
+%
+%\figvs{1}{arbiter}{}{Arbitration logic for connecting multiple processing modules to a single NoC router.}
+%

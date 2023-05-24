@@ -1,0 +1,94 @@
+#!/bin/bash
+
+export PATH=$PATH:/home/andrew/altera/13.1/modelsim_ase/bin
+
+HNOCSIM_DIR='/home/andrew/Dropbox/MASc/hnocsim'
+DESIGN_DIR=$HNOCSIM_DIR/designs/pkt_parser
+
+#remake booksim
+cd $HNOCSIM_DIR/booksim
+make
+cd $DESIGN_DIR
+
+rm -rf work
+vlib work
+
+#compile the rtl interface that talks to booksim's socket interface
+vlog -dpiheader $HNOCSIM_DIR/booksim/dpi.h $HNOCSIM_DIR/booksim/rtl_interface.sv
+
+#compile the fabric port
+vlog  $HNOCSIM_DIR/fabric_port/fabric_port_in/*.sv
+vlog  $HNOCSIM_DIR/fabric_port/fabric_port_out/*.sv
+
+#compile the fabric interface which instantiates fabric ports and an rtl interface
+vlog $HNOCSIM_DIR/booksim/fabric_interface.sv
+
+#compile ddr design
+vlog ../ddr3/simple_frame_buffer/*.sv
+vlog ../ddr3/simple_frame_buffer_noc/*.sv
+
+#compile verilog files
+vlog global_package.sv
+vlog pcapreader512.sv
+vlog fifo_emptyw.v
+vlog avalon_st_interface.sv
+vlog arbiter2to1.sv
+vlog pre_process.sv
+vlog ram.v
+vlog ethernet512.sv
+vlog ipv4_512.sv
+vlog ipv4_top.sv
+vlog send_header_payload.sv
+vlog translator_in.sv
+vlog translator_out.sv
+vlog translator_data_req.sv
+vlog translator_payload.sv
+vlog translator_combine.sv
+vlog recombine.sv
+vlog tcp512.sv
+vlog tcp_top.sv
+vlog ddr_top.sv
+vlog ddr_ipv4_top.sv
+vlog txr_to_noc.sv
+vlog noc_to_txr.sv
+vlog testbench_full.sv
+
+#########################################
+#recompile the booksim socket interface
+########################################
+
+g++ -c -fPIC -m32 -I/home/andrew/altera/13.1/modelsim_ase/include $HNOCSIM_DIR/booksim/booksim_interface.cpp
+g++ -shared -Bsymbolic -fPIC -m32 -o booksim_interface.so booksim_interface.o
+
+###############################
+#run booksim in a new terminal
+###############################
+
+if [ "$1" == "keep_open" ]; then
+	gnome-terminal --window-with-profile=keep_open -e $HNOCSIM_DIR/booksim/booksim\ noc_config &
+else
+	gnome-terminal -e $HNOCSIM_DIR/booksim/booksim\ noc_config &
+fi
+
+################
+#run simulation
+################
+
+if [ "$1" == "vsim" ]; then
+    vsim -L /home/andrew/altera/13.1/modelsim_ase/altera/verilog/altera_mf -sv_lib booksim_interface testbench_full -do wave.do
+else
+    vsim -L /home/andrew/altera/13.1/modelsim_ase/altera/verilog/altera_mf -c -sv_lib booksim_interface testbench_full -do "run -all"
+fi
+
+#cleanup
+
+killall booksim
+killall vsimk
+killall vsim
+killall vish
+
+rm -r work
+rm transcript
+rm socket
+rm *.out
+rm *.o *.so *.wlf *.vstf

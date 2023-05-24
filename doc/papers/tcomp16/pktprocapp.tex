@@ -1,0 +1,64 @@
+
+
+
+In recent years there has been a surge in demand on computer networks, causing a rapid evolution in network protocols and functionality.
+Programmable network hardware has hence become highly desirable~\cite{nunes2014survey,mckeown2008openflow}, as it can provide both the flexibility to evolve and the capacity to support the latest bandwidth demands.
+Prior work has demonstrated two ways to implement a flexible and high performing packet processor: the PP packet processor~\cite{attig2011400}, built from an FPGA, and the RMT packet processor~\cite{bosshart2013forwarding}, built from ASIC technology.
+Although both provide varying trade-offs between flexibility and performance, we believe a better trade-off can be reached by using a new packet processor design built from the NoC-enhanced FPGA.
+
+Unlike previously proposed programmable packet processors that use an OpenFlow-like cascade of programmable ``flow tables''~\cite{mckeown2008openflow}, our ``NoC Packet Processor'' (NoC-PP~\cite{bitar2015bringing}) uses a modular design style, where various modules are implemented in the FPGA fabric, each dedicated to processing a single network protocol (e.g. Ethernet, IPv4, etc.).
+Packets are switched between these protcol processing modules via the embedded NoC.
+The flexibility of the FPGA fabric allows the modules to be fully customized and later updated, as existing protocols are enhanced and new protocols are added.
+The embedded NoC provides an efficient interconnect that can support switching packets between the modules at modern network bandwidths.
+
+To evaluate this design, we implemented a packet processor that supports processing of several common network protocols: Ethernet, VLAN, IPv4, IPv6, and TCP.
+Each packet going through the processor will visit a processing module for each protocol found in its header.
+The processing modules are designed with a data path width of 512~bits running at 200~MHz, providing an overall processing throughput of 100~Gb/s.
+In order to support higher network bandwidths, several copies of the processing modules are instantiated in the fabric as desired (in this case four instantiations to support 400G, see Figure~\ref{noc-pp-uni}).
+%This ability to duplicate individual processing modules, as well as swap them in and out via full/partial reconfiguration provides a key form of design flexibility not found in previously proposed packet processor designs.
+Having the generality of the FPGA fabric provides an important advantage to FPGA-based packet processing; whereas the ASIC-based RMT design~\cite{bosshart2013forwarding} provides some flexibility, it is still limited to what is made available upon chip fabrication~\cite{bitar2015bringing}.
+
+We measure the hardware cost and performance of the NoC-PP design and compare it to the PP design~\cite{attig2011400}, another efficient FPGA-based packet processor.
+We compare to two versions of the PP design: (1) ``JustEth'', which only performs parsing on the Ethernet header, and (2) ``TcpIp4andIp6'', which performs parsing on Ethernet, IPv4, IPv6 and TCP~\cite{attig2011400}.
+Table~\ref{tbl:results} contains hardware cost and performance results of the NoC-PP and PP designs, with hardware cost measured using resource utilization as a percentage of an Altera Stratix V-GS FPGA.
+Overall, the NoC-PP proves to be more resource efficient and achieves better performance compared to the PP architecture while providing the same degree of hardware flexibility via the FPGA fabric.
+For the smaller application (JustEth), the NoC-PP design is 3.2$\times$ more efficient, whereas for the larger application (TcpIp4Ip6), it is 1.7$\times$ more efficient.
+NoC-PP also reduces latency by 3.7$\times$ and 1.5$\times$ compared to PP for JustEth and TcpIp4Ip6, respectively.
+
+\figvs{0.9}{noc-pp-uni}{}{The NoC-PP design for an Ethernet/VLAN/IPv4/IPv6/TCP packet processor (Eth=Ethernet+VLAN). Processing modules run at 100G, and are instantiated four times to support 400G processing.}
+
+\begin{table}[t]
+\center
+\caption{Comparison of the NoC-PP and PP architectures}
+\begin{tabular}{lllll}
+\toprule
+ \textbf{Application} & \textbf{Architecture} & \textbf{Resource} & \textbf{Latency} & \textbf{Throughput} \\
+ & & \textbf{Utilization} & \textbf{(ns)} & \textbf{(Gb/s)} \\
+ & & \textbf{(\% FPGA)} & & \\
+\midrule
+\multirow{2}{*}{JustEth} &  NoC-PP  & 3.6\%  & 79 & 400 \\
+                         &  \cellcolor{gray!25}PP~\cite{attig2011400}      & \cellcolor{gray!25}11.6\% & \cellcolor{gray!25}293 & \cellcolor{gray!25}343 \\
+\midrule
+\multirow{2}{*}{TcpIp4Ip6} &  NoC-PP  & 9.4\%  & 200 & 400 \\
+                           &  \cellcolor{gray!25}PP~\cite{attig2011400}      & \cellcolor{gray!25}15.6\% & \cellcolor{gray!25}309 & \cellcolor{gray!25}325 \\
+\bottomrule
+\end{tabular}
+\label{tbl:results}
+\end{table}
+
+It is also important to determine what brings these efficiencies to NoC-PP; is it the new module-based packet processor architecture, the introduction of the hard NoC, or a synergistic fusion of the two?
+To answer this question, we began by replacing the hard NoC in our design with an equivalent soft NoC, and separately quantified the cost of the NoC and the processing modules.
+We also built another iteration of our design using customized soft crossbars such that only modules that need to communicate are connected.
+As can be seen in Figure~\mbox{\ref{hard-vs-soft-area}}, the costs of the soft NoC and the soft crossbar are 29$\times$ and 11$\times$ greater than that of the hard NoC, respectively.
+The significantly higher cost of building NoC-PP's interconnection network out of the reconfigurable FPGA fabric is due to the fact it runs at a considerably lower clock frequency compared to the hard NoC and must therefore use wide datapaths to transport the high bandwidth data.
+Switching between these wide datapaths requires large multiplexers and wide buffers that consume high amounts of resources.
+The design therefore achieves significant savings by hardening this interconnect in the embedded NoC.
+
+Since the processing modules form a small fraction of the design cost when using a soft interconnect, NoC-PP can therefore achieve significant overall savings when replacing the soft interconnect with a hard NoC.
+On the other hand, the PP design uses a feed-forward design style.
+Rather than switching between protocol modules, PP uses tables containing ``microcode'' entries for all possible protocols that must be processed at that stage~\cite{attig2011400}.
+Thus, no wide multiplexing exists in the design that can be efficiently replaced by a hard NoC.
+The logic and memory within each stage form the majority PP's hardware cost, which would not change if a hard NoC was introduced.
+We therefore conclude that the efficiencies from NoC-PP stem from a synergistic fusion of using the hard NoC with our module-based packet processor architecture.
+
+\figvs{1}{hard-vs-soft-area}{}{Area breakdown of NoC-PP when using a hard NoC, a soft NoC or a soft custom crossbar (Xbar).}

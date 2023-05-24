@@ -1,0 +1,354 @@
+% This is "sig-alternate.tex" V2.0 May 2012
+% This file should be compiled with V2.5 of "sig-alternate.cls" May 2012
+%
+% This example file demonstrates the use of the 'sig-alternate.cls'
+% V2.5 LaTeX2e document class file. It is for those submitting
+% articles to ACM Conference Proceedings WHO DO NOT WISH TO
+% STRICTLY ADHERE TO THE SIGS (PUBS-BOARD-ENDORSED) STYLE.
+% The 'sig-alternate.cls' file will produce a similar-looking,
+% albeit, 'tighter' paper resulting in, invariably, fewer pages.
+%
+% ----------------------------------------------------------------------------------------------------------------
+% This .tex file (and associated .cls V2.5) produces:
+%       1) The Permission Statement
+%       2) The Conference (location) Info information
+%       3) The Copyright Line with ACM data
+%       4) NO page numbers
+%
+% as against the acm_proc_article-sp.cls file which
+% DOES NOT produce 1) thru' 3) above.
+%
+% Using 'sig-alternate.cls' you have control, however, from within
+% the source .tex file, over both the CopyrightYear
+% (defaulted to 200X) and the ACM Copyright Data
+% (defaulted to X-XXXXX-XX-X/XX/XX).
+% e.g.
+% \CopyrightYear{2007} will cause 2007 to appear in the copyright line.
+% \crdata{0-12345-67-8/90/12} will cause 0-12345-67-8/90/12 to appear in the copyright line.
+%
+% ---------------------------------------------------------------------------------------------------------------
+% This .tex source is an example which *does* use
+% the .bib file (from which the .bbl file % is produced).
+% REMEMBER HOWEVER: After having produced the .bbl file,
+% and prior to final submission, you *NEED* to 'insert'
+% your .bbl file into your source .tex file so as to provide
+% ONE 'self-contained' source file.
+%
+% ================= IF YOU HAVE QUESTIONS =======================
+% Questions regarding the SIGS styles, SIGS policies and
+% procedures, Conferences etc. should be sent to
+% Adrienne Griscti (griscti@acm.org)
+%
+% Technical questions _only_ to
+% Gerald Murray (murray@hq.acm.org)
+% ===============================================================
+%
+% For tracking purposes - this is V2.0 - May 2012
+\documentclass{sig-alternate}
+\setlength{\pdfpagewidth}{8.5in}
+
+\setlength{\pdfpageheight}{11in}
+
+\usepackage{textcomp}
+\usepackage{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+\usepackage{subfig}
+\usepackage{booktabs}
+\usepackage{multirow}
+%\usepackage{natbib}
+\usepackage{color,soul}
+\usepackage{enumitem}
+\usepackage{balance}
+
+%\usepackage{amsmath,scalerel}
+
+%\DeclareMathOperator*{\Bigcdot}{\scalerel*{\cdot}{\bigodot}}
+
+\newtheorem{cond}{Condition}
+\newtheorem{defn}{Definition}
+
+\usepackage{etoolbox}
+
+\usepackage{microtype}
+
+\usepackage{fixltx2e}
+
+
+%command to comment out stuff
+\newcommand{\comment}[1]{}
+
+%space saving!!!
+%\comment{
+\addtolength{\textfloatsep}{-10pt}
+\addtolength{\floatsep}{-7pt}
+\addtolength{\abovecaptionskip }{-5pt}
+\addtolength{\dbltextfloatsep}{-7pt}
+\addtolength{\dblfloatsep}{-5pt}
+
+%Change caption size to small
+\renewcommand{\captionfont}{\small}
+\renewcommand{\captionlabelfont}{\small}
+
+%reduce space between bib entries -- requires natbib
+%\setlength{\bibsep}{0.04cm}
+
+%use 0.95 or higher
+\linespread{0.93}
+
+\setlist[itemize]{leftmargin=*}
+\setlist[enumerate]{leftmargin=*}
+
+
+%}
+
+\begin{document}
+\makeatletter
+\patchcmd{\@afterheading}%
+    {\clubpenalty \@M}{\clubpenalties 3 \@M \@M 0}{}{}
+\patchcmd{\@afterheading}%
+    {\clubpenalty \@clubpenalty}{\clubpenalties 2 \@clubpenalty 0}{}{}
+\makeatother
+\sloppy
+%
+% --- Author Metadata here ---
+\conferenceinfo{FPGA}{'15, February 22--24 2015, Monterey, CA, USA}
+\CopyrightYear{2015} % Allows default copyright year (20XX) to be over-ridden - IF NEED BE.
+\crdata{978-1-4503-3315-3/15/02\\
+http://dx.doi.org/10.1145/2684746.2689074}  % Allows default copyright data (0-89791-88-6/97/05) to be over-ridden - IF NEED BE.
+
+
+% --- End of Author Metadata ---
+
+
+%--------------------------------------------------------------------------------------------
+% Custom commands
+%--------------------------------------------------------------------------------------------
+
+%\renewcommand{\footnoterule}{%
+%  \kern -3pt
+%  \hrule width 0.49\textwidth height 0.5pt
+%  \kern 2pt
+%} 
+
+\newcommand{\til}{{\fontfamily{ptm}\selectfont\texttildelow}}
+\newcommand{\xx}{$\times${ }}
+
+%shortcut command for pdf figures
+\newcommand{\fig}[3]{\begin{figure}[t]
+\centering
+\includegraphics[width=2.5in,#2]{images/#1}
+\caption{#3}
+\label{#1}
+\end{figure}}
+
+%shortcut command for pdf figures
+\newcommand{\figg}[4]{\begin{figure}[t]
+\centering
+\includegraphics[width=#2,#3]{images/#1}
+\caption{#4}
+\label{#1}
+\end{figure}}
+
+%shortcut command for pdf figures
+\newcommand{\figc}[3]{\begin{figure}[t]
+\centering
+\includegraphics[width=1.0\columnwidth,keepaspectratio,#2]{images/#1}
+\caption{#3}
+\label{#1}
+\end{figure}}
+
+%shortcut command for pdf figures
+\newcommand{\figch}[3]{\begin{figure}[h]
+\centering
+\includegraphics[width=1.0\columnwidth,keepaspectratio,#2]{images/#1}
+\caption{#3}
+\label{#1}
+\end{figure}}
+
+
+%shortcut command for pdf figures
+\newcommand{\figvs}[4]{\begin{figure}[!t]
+\centering
+\includegraphics[width=#1\columnwidth,keepaspectratio,#3]{images/#2}
+\caption{#4}
+\label{#2}
+\end{figure}}
+
+%shortcut command for pdf figures
+\newcommand{\figvsh}[4]{\begin{figure}[!h]
+\centering
+\includegraphics[width=#1\columnwidth,keepaspectratio,#3]{images/#2}
+\caption{#4}
+\label{#2}
+\end{figure}}
+
+
+%shortcut command for pdf figures
+\newcommand{\figfull}[4]{\begin{figure*}[!t]
+\centering
+\includegraphics[width=#1\columnwidth,keepaspectratio,#3]{images/#2}
+\caption{#4}
+\label{#2}
+\end{figure*}}
+
+%shortcut command for pdf figures with placement hint
+\newcommand{\figp}[4]{\begin{figure}[#4]
+\centering
+\includegraphics[width=2.5in,#2]{images/#1}
+\caption{#3}
+\label{#1}
+\end{figure}}
+
+%adding subsubsubsection
+\newcommand{\subsubsubsection}[1]{\vspace{0.2cm}\noindent\textbf{\textit{#1:}}}
+
+
+
+%--------------------------------------------------------------------------------------------
+% Title
+%--------------------------------------------------------------------------------------------
+
+\title{Designing with a NoC-Enhanced FPGA} 
+\title{Take the Highway:\\
+Design and Simulation for a NoC-Enhanced FPGA} 
+\title{Take the Highway:\\
+Design and Simulation for Embedded NoCs on FPGAs} 
+\title{Take the Highway:\\
+Design for Embedded Networks-on-Chip on FPGAs} 
+\title{Take the Highway:\\
+Design for Embedded NoCs on FPGAs} 
+\title{Take the Highway: Design for Embedded NoCs on FPGAs} 
+
+%\subtitle{--blind submission--}
+
+%\comment{
+
+\numberofauthors{1} %  in this sample file, there are a *total*
+% of EIGHT authors. SIX appear on the 'first-page' (for formatting
+% reasons) and the remaining two appear in the \additionalauthors section.
+%
+\author{
+% 1st. author
+\alignauthor
+Mohamed S. Abdelfattah, Andrew Bitar, Vaughn Betz\\\vspace{.15cm}
+       \affaddr{Department of Electrical and Computer Engineering}\\\vspace{.03cm}
+       \affaddr{University of Toronto, Toronto, ON, Canada}\\\vspace{.04cm}
+       \email{\{mohamed, bitar, vaughn\}@eecg.utoronto.ca}
+}
+
+%}%end of commented block
+
+
+\maketitle
+
+
+%
+%#############################################################
+% ABSTRACT
+%-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+%
+\begin{abstract}
+\input{abstract}
+\end{abstract}
+%
+%
+% A category with the (minimum) three required fields
+%check those later
+\category{B.4.3}{Input/Output and Data Communications}{Interconnections (Subsystems)}
+%\category{B.5.1}{Register-Level-Transfer Implementation}{Design}[Styles]
+%\category{B.7.1}{Integrated Circuits}{Types and Design Styles}
+%
+%\terms{Design, Performance}
+%
+%\keywords{FPGA, NoC, Interconnect, Latency-insensitive}
+%
+%#############################################################
+\section{Introduction}
+%-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+%
+\input{intro}
+%
+%
+%#############################################################
+\section{Embedded Hard NoC}
+\label{sec:hnoc}
+%-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+%
+\input{hardnoc}
+%
+%
+%#############################################################
+\section{FabricPort: Interface between FPGA and NoC}
+\label{sec_fabricport}
+%-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+%
+\input{fabricport}
+%
+%
+%#############################################################
+\section{FPGA-dictated NoC Design}
+\label{sec_fpganoc}
+%-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+%
+\input{fpganoc}
+%
+%
+%#############################################################
+%\section{Simulator}
+%-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+%
+%\input{simulator}
+%
+%
+%#############################################################
+\section{Application Case Studies}
+\label{sec_apps}
+%-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+%
+\subsection{Simulator}
+\label{sec:sim}
+\input{simulator}
+%
+\subsection{JPEG Compression\\\textit{(Latency-sensitive, streaming)}}
+\input{streamapp}
+%
+\subsection{Ethernet Switch \textit{(Latency-insensitive, streaming)}}
+\input{switchapp}
+%
+%\subsection{On-Chip Memory \textit{(Latency-insensitive, memory-mapped)}}
+%\input{memapp}
+%
+%
+%#############################################################
+\section{Conclusion}
+%-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+%
+\input{conc}
+%
+%
+%\comment{
+%#############################################################
+\section{Acknowledgments}
+%-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+%
+We are indebted to Prof. Natalie Enright-Jerger and her research team (Shehab Elsayed, Mario Badr and Robert Hesse) for NoC discussions and for providing some of the code used to build \texttt{RTL2Booksim}.
+We would also like to thank David Lewis, Mike Hutton, Dana How and Desh Singh for feedback on FPGAs, and Kevin Murray for feedback on latency-insensitive design.
+This work is funded by Altera, NSERC and Vanier CGS.
+
+\newpage
+%}
+%
+%
+% The following two commands are all you need in the
+% initial runs of your .tex file to
+% produce the bibliography for the citations in your paper.
+\begin{small}
+
+\bibliographystyle{abbrv}
+
+\bibliography{fpga15} 
+
+\end{small}
+
+\end{document}
+

@@ -1,0 +1,41 @@
+#!/bin/bash
+
+
+BOOKSIM_DIR='../../booksim'
+DESIGN_DIR=`pwd`
+
+#first compile booksim if it wasnt already compiled
+cd $BOOKSIM_DIR
+
+make
+
+cd $DESIGN_DIR
+
+#now compile the test file
+g++ -I$BOOKSIM_DIR -std=c++11 fabric_sw_interface.cpp test.cpp -o test
+
+
+if [ "$1" == "keep_open" ]; then
+	gnome-terminal --window-with-profile=keep_open -e $BOOKSIM_DIR/booksim\ noc_config &
+else
+	gnome-terminal -e $BOOKSIM_DIR/booksim\ noc_config &
+fi
+
+
+#wait a sec until the second terminal runs booksim
+sleep 2
+
+#finally, run the test code
+if [ "$1" == "valgrind" ]; then
+    valgrind ./test
+else
+    ./test
+fi
+
+#close things
+
+killall booksim
+
+rm -f socket
+rm -f *.out
+rm -f test

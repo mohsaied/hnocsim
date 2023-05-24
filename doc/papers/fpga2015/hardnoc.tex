@@ -1,0 +1,82 @@
+%
+%
+\comment{
+\begin{itemize}
+	\item present the NoC that we are considering in this paper:
+	\item give the area  as percentage of a stratix V logic resources.
+	\item Scale the frequency to 28nm process technology.
+	\item show the packet format - explain packet and flit.
+	\item this should lead in to the next section: now keeping all of that in mind, how do we interface the fabric and the NoC?
+	\item want to send only the valid flits, interface the two widths etc --> FabricPort
+\end{itemize}
+}
+%
+%
+
+Before presenting our embedded NoC, we define some of the NoC terminology~\cite{dally_book} that may be unfamiliar to the reader:
+\begin{itemize}
+\setlength\itemsep{-0.33mm}
+\item Flit: The smallest unit of data that can be transported on the NoC; it is equivalent to the NoC link width.
+\item Packet: One or more related flits that together form a logical meaning.
+\item Virtual channels (VCs): Separate FIFO buffers at a NoC router input port; if we use 2 VCs in our NoC, then each router input can store incoming flits in one of two possible FIFO buffers.
+\item Credit-based flow control: A backpressure mechanism in which each NoC router keeps track of the number of available buffer spaces (credits) downstream, and only sends a flit downstream if it has available credits.
+\end{itemize}
+
+Our embedded packet-switched NoC targets a large 28~nm FPGA device.
+The NoC presented in this section is used throughout this paper in our design and evaluation sections.
+Fig.~\ref{router} displays a high-level view of an NoC embedded on an FPGA.
+We base our router design on a state-of-the-art full-featured packet-switched router~\cite{becker_router}.
+%In Section~\ref{sec_fpganoc}, we show how to leverage this NoC router so that it may be used in typical FPGA designs.
+
+In designing the embedded NoC, we must over-provision its resources, much like other FPGA interconnect resources, so that it can be used in connecting \textit{any} application.
+We therefore look at high bandwidth I/Os to determine the required NoC link bandwidth.
+The highest-bandwidth interface on FPGAs is usually a DDR3 interface, capable of transporting 64~bits of data at a speed of 1067~MHz at double-data rate (\til17 GB/s).
+We design the NoC such that it can transport the entire bandwidth of a DDR3 interface on one of its links; therefore, we can connect to DDR3, or to one of the masters accessing it using a single router port.
+Additionally, we must be able to transport the control data of DDR3 transfers, such as the address, alongside the data.
+We therefore choose a width of 150~bits for our NoC links and router ports, and we are able to run the NoC at 1.2~GHz\footnote{We implement the NoC in 65~nm standard cells and scale the frequency obtained by 1.35\xx to match the speed scaling of Xilinx's (also standard cell) DSP blocks from Virtex5 (65~nm) to Virtex7 (28~nm)~\cite{xilinx_datasheets}.}~\cite{noc_designer}.
+By multiplying our width and frequency, we find that our NoC is able to transport a bandwidth of 22.5~GB/s on each of its links.
+
+%
+%
+\begin{table}[!t]
+\centering
+\begin{small}
+\setlength{\tabcolsep}{3.5pt}
+    \caption{NoC parameters and properties for 28~nm FPGAs.}
+    \label{noc_params}
+    \begin{tabular}{ccccc}
+    \toprule
+    NoC Link Width & \# VCs & Buffer Depth & \# Nodes & Topology\\
+    \midrule
+	150 bits &       2       &	 10 flits/VC     &      16 nodes & Mesh \\
+    \bottomrule
+	\\
+    \end{tabular}
+\setlength{\tabcolsep}{6pt}
+    \begin{tabular}{ccc}
+    \toprule
+    Area$^\dagger$  & Area Fraction$^*$ & Frequency   \\
+    \midrule
+	       528 LABs          &      1.3\%       &	 1.2~GHz    \\
+    \bottomrule
+    \end{tabular}
+    \begin{tabular}{ccc}
+	\multicolumn{3}{l}{$^\dagger$LAB: Area equivalent to a Stratix~V logic cluster.}\\
+	\multicolumn{3}{l}{$^*$Percentage of core area of a large Stratix~V FPGA.}\\
+    \end{tabular}
+\end{small}
+\end{table}
+%
+%
+
+Table~\ref{noc_params} summarizes the NoC parameters and properties.
+We use 2 VCs in our NoC.
+Previous work has shown that a second VC reduces congestion by \til30\%~\cite{fpl}.
+We also leverage VCs to avoid deadlock, and merge data streams as we discuss in Sections~\ref{sec_fabricport} and \ref{sec_fpganoc}.
+Additionally, we believe that the capabilities offered by VCs -- such as assigning priorities to different messages types -- would be useful in future FPGA designs.
+The buffer depth per VC is provisioned such that it is not a cause for throughput degradation (see Section~\ref{subsec_guarantees}).
+With the given parameters, each embedded router occupies an area equivalent to 35~logic clusters (Stratix-V LABs), including the interface between the router and the FPGA fabric, and including the wire drivers necessary for the hard NoC links~\cite{trets}.
+As Table~\ref{noc_params} shows, the whole 16-node NoC occupies 528~LABs, a mere 1.3\% of a large 28~nm Stratix-V FPGA core area (excluding I/Os).
+
+%
+%

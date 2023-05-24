@@ -1,0 +1,34 @@
+%
+\comment{
+
+1. Benefit of OpenFlow's flow table architecture: being able to reconfigure on the fly
+2. Performing full FPGA reconfiguration cannot be done on the fly
+3. Partial reconfiguration could solve this, but has yet to be proven to be feasible
+4. The NoC is more amenable to partial reconfiguration, as modules are decoupled (don't have to have same clock either)
+5. Partial reconfiguration of individual processing modules has the potential to be done on the fly
+6. Left for future work
+
+}
+%
+
+A key advantage to OpenFlow's flow table architecture is the capability of updating processing rules ``on-the-fly''. In other words, the table entries can be updated with new match-action rules even while the processor is receiving packets.
+This is trickier in the NoC-PP architecture.
+%Modern FPGAs require the reconfiguration of the entire chip in order to perform a design change.
+%During reconfiguration, the chip's transceivers cannot accept any data.
+Although NoC-PP may still contain tables that can perform soft updates, its decreased reliance on memory means that more of its processing has been moved to dedicated logic in the FPGA fabric.
+Typically, modifying an FPGA design requires complete reconfiguration of the device, during which the transceivers cannot accept any data.
+Making processing rule updates through a complete reconfiguration would require the packet processor to be effectively ``paused''.
+
+Partial reconfiguration~\cite{kao2005benefits} presents a potential solution to this limitation.
+%Unlike the monolithic PP design, which would require a complete reconfiguration to perform architecture changes, NoC-PP has both logically and physically partitioned processing modules.
+Unlike the monolithic PP design, NoC-PP has both logically and physically partitioned processing modules.
+The modules share a common interface and are decoupled by the NoC, making the design highly amenable to partial reconfiguration of individual processing modules.
+While soft flow table updates allows for processing rule changes, partial reconfiguration makes both rule and architecture changes possible.
+To perform any architecture changes to PP, such as modifying table sizes or the action set, a complete reconfiguration would be necessary.
+On the other hand, NoC-PP can partially reconfigure individual processing modules while the remaining modules remain operational.
+Thus, partial reconfiguration would open up the possibility of modules being updated/added/removed while the packet processor remains ``live''.
+%This would open up the possibility of modules being updated/added/removed while the packet processor remains ``live''.
+%However, its feasibility has been met with various challenges, such as \textit{blank, blank and blank}.
+%Using the embedded NoC to decouple a design such as NoC-PP has the potential to facilitate partial reconfiguration.
+An investigation into partial reconfiguration in a NoC-enhanced FPGA is beyond the scope of this paper and is left for future work.
+

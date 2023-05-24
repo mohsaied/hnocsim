@@ -1,0 +1,8 @@
+libraries
+*.ver
+*.hex
+*.ini
+*.tr
+*.wlf
+*.vstf
+transcript

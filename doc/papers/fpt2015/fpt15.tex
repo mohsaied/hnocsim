@@ -1,0 +1,355 @@
+
+\documentclass[conference,letterpaper]{IEEEtran}
+\setlength{\pdfpagewidth}{8.5in}
+
+\setlength{\pdfpageheight}{11in}
+
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+%\usepackage{subfigure}
+\usepackage{textcomp}
+\usepackage{hyperref}
+\hypersetup{pdfpagemode=UseNone}
+%\usepackage{subfig}
+\usepackage{booktabs}
+\usepackage{multirow}
+%\usepackage{natbib}
+\usepackage{color,soul}
+\let\labelindent\relax
+\usepackage{enumitem}
+\usepackage{balance}
+
+%\usepackage{amsmath,scalerel}
+
+%\DeclareMathOperator*{\Bigcdot}{\scalerel*{\cdot}{\bigodot}}
+
+\newtheorem{cond}{Condition}
+\newtheorem{defn}{Definition}
+
+\usepackage{etoolbox}
+
+\usepackage{microtype}
+
+\usepackage{fixltx2e}
+
+\usepackage[numbers,sort&compress]{natbib}
+
+\usepackage[table]{xcolor}
+
+
+%command to comment out stuff
+\newcommand{\comment}[1]{}
+
+%-----------------------------------------------------
+%space saving!!!
+\newcommand{\abovesectitle}{0pt}
+\newcommand{\undersectitle}{0pt}
+\newcommand{\abovesubsectitle}{0pt}
+\newcommand{\undersubsectitle}{0pt}
+\newcommand{\abovesubsubsectitle}{0pt}
+\newcommand{\undersubsubsectitle}{0pt}
+\newcommand{\abovesubsubcancel}{0pt}
+%\comment{
+\addtolength{\textfloatsep}{-17pt}
+\addtolength{\floatsep}{-7pt}
+\addtolength{\abovecaptionskip }{-4pt}
+\addtolength{\dbltextfloatsep}{-13pt}
+\addtolength{\dblfloatsep}{-5pt}
+
+%Change caption size to small
+\renewcommand{\captionfont}{\small}
+\renewcommand{\captionlabelfont}{\small}
+
+%Spacing before and after sub/section
+\renewcommand{\abovesectitle}{-4pt}
+\renewcommand{\undersectitle}{-4pt}
+%
+\renewcommand{\abovesubsectitle}{-6pt}
+\renewcommand{\undersubsectitle}{-3pt}
+%
+\renewcommand{\abovesubsubsectitle}{-5pt}
+\renewcommand{\undersubsubsectitle}{-2pt}
+\renewcommand{\abovesubsubcancel}{5pt}
+
+%reduce space between bib entries -- requires natbib
+%\setlength{\bibsep}{0.04cm}
+
+%use 0.95 or higher
+\linespread{0.92}
+
+\setlist[itemize]{leftmargin=*}
+\setlist[enumerate]{leftmargin=*}
+%}
+%-----------------------------------------------------
+
+
+
+\begin{document}
+%\makeatletter
+%\patchcmd{\@afterheading}%
+%    {\clubpenalty \@M}{\clubpenalties 3 \@M \@M 0}{}{}
+%\patchcmd{\@afterheading}%
+%    {\clubpenalty \@clubpenalty}{\clubpenalties 2 \@clubpenalty 0}{}{}
+%\makeatother
+\sloppy
+%
+
+
+%--------------------------------------------------------------------------------------------
+% Custom commands
+%--------------------------------------------------------------------------------------------
+
+%\renewcommand{\footnoterule}{%
+%  \kern -3pt
+%  \hrule width 0.49\textwidth height 0.5pt
+%  \kern 2pt
+%} 
+
+\newcommand{\til}{{\fontfamily{ptm}\selectfont\texttildelow}}
+\newcommand{\xx}{$\times${ }}
+
+%shortcut command for pdf figures
+\newcommand{\fig}[3]{\begin{figure}[t]
+\centering
+\includegraphics[width=2.5in,#2]{figs/#1}
+\caption{#3}
+\label{#1}
+\end{figure}}
+
+%shortcut command for pdf figures
+\newcommand{\figg}[4]{\begin{figure}[t]
+\centering
+\includegraphics[width=#2,#3]{figs/#1}
+\caption{#4}
+\label{#1}
+\end{figure}}
+
+%shortcut command for pdf figures
+\newcommand{\figc}[3]{\begin{figure}[t]
+\centering
+\includegraphics[width=1.0\columnwidth,keepaspectratio,#2]{figs/#1}
+\caption{#3}
+\label{#1}
+\end{figure}}
+
+%shortcut command for pdf figures
+\newcommand{\figch}[3]{\begin{figure}[h]
+\centering
+\includegraphics[width=1.0\columnwidth,keepaspectratio,#2]{figs/#1}
+\caption{#3}
+\label{#1}
+\end{figure}}
+
+
+%shortcut command for pdf figures
+\newcommand{\figvs}[4]{\begin{figure}[!t]
+\centering
+\includegraphics[width=#1\columnwidth,keepaspectratio,#3]{figs/#2}
+\caption{#4}
+\label{#2}
+\end{figure}}
+
+%shortcut command for pdf figures
+\newcommand{\figvsh}[4]{\begin{figure}[!h]
+\centering
+\includegraphics[width=#1\columnwidth,keepaspectratio,#3]{figs/#2}
+\caption{#4}
+\label{#2}
+\end{figure}}
+
+
+%shortcut command for pdf figures
+\newcommand{\figfull}[4]{\begin{figure*}[!t]
+\centering
+\includegraphics[width=#1\columnwidth,keepaspectratio,#3]{figs/#2}
+\caption{#4}
+\label{#2}
+\end{figure*}}
+
+%shortcut command for pdf figures with placement hint
+\newcommand{\figp}[4]{\begin{figure}[#4]
+\centering
+\includegraphics[width=2.5in,#2]{figs/#1}
+\caption{#3}
+\label{#1}
+\end{figure}}
+
+%adding subsubsubsection
+\newcommand{\subsubsubsection}[1]{\vspace{0.2cm}\noindent\textbf{\textit{#1:}}}
+
+
+
+%--------------------------------------------------------------------------------------------
+% Title
+%--------------------------------------------------------------------------------------------
+
+\title{Bringing Programmability to the Data Plane: \\ Packet Processing with a NoC-Enhanced FPGA} 
+
+%\subtitle{--blind submission--}
+
+
+% author names and affiliations
+% use a multiple column layout for up to three different
+% affiliations
+\author{\IEEEauthorblockN{Andrew Bitar, Mohamed S. Abdelfattah, Vaughn Betz}
+\IEEEauthorblockA{Department of Electrical and Computer Engineering\\
+University of Toronto, Toronto, ON, Canada\\
+\{bitar, mohamed, vaughn\}@eecg.utoronto.ca}
+}
+
+%\author{-blinded-}
+
+
+
+\maketitle
+
+
+%
+%#############################################################
+% ABSTRACT
+%-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+%
+\begin{abstract}
+\input{abstract}
+\end{abstract}
+%
+%
+%
+%#############################################################
+\vspace{\abovesectitle}
+\section{Introduction}
+\vspace{\undersectitle}
+%-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+%
+\input{intro}
+%
+%
+%#############################################################
+%#############################################################
+\vspace{\abovesectitle}
+\section{Background}
+\vspace{\undersectitle}
+%-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+%
+\subsection{NoC-Enhanced FPGA}
+\label{sec:noc-fpga}
+\input{noc}
+%
+\subsection{Match Table Packet Processors}
+\label{sec:bgd}
+\input{background}
+%
+%
+%#############################################################
+\vspace{\abovesectitle}
+\section{The NoC Packet Processor}
+\label{sec:design}
+\vspace{\undersectitle}
+%-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+%
+\subsection{Design Overview}
+\input{design-overview}
+%
+\subsection{The NoC-Crossbar}
+\input{noc-crossbar}
+%
+\subsection{Inter-Module Information Passing}
+\input{inter-module}
+%
+\subsection{Design Example: Eth-IPv4/IPv6-TCP}
+\label{sec:design-example}
+\input{design-example}
+%
+%
+%#############################################################
+\vspace{\abovesectitle}
+\section{Evaluation}
+\label{sec:eval}
+\vspace{\undersectitle}
+%-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+%
+\subsection{Simulation and Synthesis Setup}
+\label{sec:setup}
+\input{setup}
+%
+\subsection{Design Efficiency}
+\vspace{-0.1cm}
+\input{efficiency}
+%
+\vspace{-0.1cm}
+\subsection{Design Flexibility}
+\label{sec:flex}
+\input{exploration}
+\vspace{-1mm}
+%
+%
+%\subsection{Design Scalibility}
+%\label{sec:scale}
+%\input{scalability}
+%
+%#############################################################
+%\vspace{\abovesectitle}
+\section{Design Enhancements}
+\label{sec:disc}
+\vspace{-1mm}
+%\vspace{\undersectitle}
+%-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+%
+\subsection{Virtual Channel Priority Scheme}
+\vspace{-1mm}
+\input{vc}
+%\vspace{-1mm}
+%
+\subsection{Partial Reconfiguration}
+\label{sec:reconfig}
+\vspace{-0.1cm}
+\input{reconfig}
+%
+\vspace{-0.1cm}
+\subsection{External Memory Offload}
+\label{sec:ddr}
+\vspace{-0.1cm}
+\input{ddr}
+%
+%\subsection{High-Level Language}
+%
+%#############################################################
+%\vspace{\abovesectitle}
+\section{Conclusion}
+\vspace{\undersectitle}
+%-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+%
+\input{conc}
+%
+%
+%\comment{
+%#############################################################
+\vspace{\abovesectitle}
+%\section*{Acknowledgments}
+\vspace{\undersectitle}
+%-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+%
+%The authors would like to thank \textbf{Dr. Sandra Fiset} for her guidance and wisdom.
+%This work is funded by Altera, NSERC and Vanier CGS.
+
+
+%}
+%
+%
+% The following two commands are all you need in the
+% initial runs of your .tex file to
+% produce the bibliography for the citations in your paper.
+\begin{small}
+
+%\vspace{\abovesectitle}
+%\vspace{-2.5mm}
+
+\bibliographystyle{IEEEtran}
+%
+\bibliography{IEEEabrv,fpt15}
+
+\end{small}
+
+\end{document}
+

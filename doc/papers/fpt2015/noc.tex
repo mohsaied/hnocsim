@@ -1,0 +1,36 @@
+
+\comment{
+%
+\begin{itemize}
+\item NoCs are a form of scalable interconnect that performs distributed arbitration between modules to send data between them.
+\item They have built-in arbitration, switching and buffering to be able to do so efficiently.
+\item Additionally, built-in credit-based backpressure manages the flow of data packets through the NoC.
+\item Previous work has looked into how to include an NoC on FPGAs.
+\item Efficient way to do it is to harden the NoC completely and run it at a very high frequency.
+\item This frequency is much higher than the FPGA fabric, so to be able to connect an FPGA module, we use a Fabricport that bridges the speed and width of data. 
+\item Explain briefly how it works.
+\end{itemize}
+%
+}
+
+\figvs{1}{embedded_noc}{}{A NoC-Enhanced FPGA. The embedded NoC is implemented in hard logic, and connects to modules on the FPGA through a FabricPort~\cite{abdelfattah2015take}.}
+
+Existing FPGAs contain only fine-grained programmable blocks (lookup-tables, registers and multiplexers) from which an application's interconnect can be constructed.
+Previous work has proposed the inclusion of an embedded NoC to augment this fine-grained interconnect so as to better interconnect an FPGA application. 
+Embedded NoCs have been shown to improve both area and power efficiency, and ease timing closure compared to traditionally-used soft buses configured from the FPGA's programmable blocks~\cite{trets,tvlsi,micro}.
+
+Figure~\ref{embedded_noc} shows an embedded NoC on the FPGA.
+The NoC routers and links run approximately four times as fast as the FPGA fabric; therefore, we use a special component called the FabricPort to bridge both width and frequency in a flexible way between the embedded NoC routers and soft FPGA modules~\cite{abdelfattah2015take}.
+Furthermore, the processing modules connected to the NoC need not operate using the same clock frequency or phase -- the FabricPort essentially decouples the modules connected together through the NoC.
+The routers are packet-switched virtual-channel routers that perform distributed arbitration and switching of packets coming from modules connected to the NoC.
+These routers also contain built-in buffering and credit-based backpressure, and so can automatically respond to bursts of data and heavy traffic on its links while maintaining application correctness.
+
+The NoC we use has been evaluated on a large 28-nm Stratix V FPGA, and can run at 1.2~GHz in that process technology~\cite{abdelfattah2015take}.
+The NoC links are 150 bits wide each and so can transport up to 180~Gb/s in each direction between any two routers, of which we have 16 as illustrated in Figure~\ref{embedded_noc}.
+Because it is implemented in efficient hard logic, this NoC only consumes 1.3\% of the core area of an Altera Stratix V FPGA.
+The FabricPort for this NoC can connect a module running at any FPGA frequency and any width between 1 and 600~bits to the NoC routers at 150 bits and 1.2~GHz.
+It does so using a combination of clock-crossing and width adaptation circuitry that formats data into NoC packets in an efficient way~\cite{abdelfattah2015take}.
+
+
+
+

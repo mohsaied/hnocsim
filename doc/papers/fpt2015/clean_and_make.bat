@@ -1,0 +1,21 @@
+taskkill /FI "WINDOWTITLE eq fpt15.pdf - Adobe Reader"
+del *.blg
+del *.bbl
+del *.toc
+del *.out
+del *.log
+del *.aux
+del *.dvi
+del *.mtc*
+del *.nlo
+del *.maf
+del *.lot
+del *.lof
+del *.ilg
+del *.brf
+del *.nls	
+pdflatex fpt15.tex
+bibtex fpt15
+pdflatex fpt15.tex
+pdflatex fpt15.tex
+start fpt15.pdf

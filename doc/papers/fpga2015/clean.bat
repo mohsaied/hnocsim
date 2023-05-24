@@ -1,0 +1,15 @@
+del *.blg
+del *.bbl
+del *.toc
+del *.out
+del *.log
+del *.aux
+del *.dvi
+del *.mtc*
+del *.nlo
+del *.maf
+del *.lot
+del *.lof
+del *.ilg
+del *.brf
+del *.nls

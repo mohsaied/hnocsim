@@ -1,0 +1,22 @@
+
+\comment{
+%
+\begin{itemize}
+\item Short section saying how we can use DDR - would be stronger if I can run some experiments to quantify when it starts being a net win.
+\item Look into video over IP as a sample use-case that is related to networking - does it fit in with openflow?
+\item Talk about storage controller and hashing scheme (briefly).
+\item Say how it could fit in (store the body and route the header then fetch the body back).
+\end{itemize}
+%
+}
+
+In NoC-PP, we stream our data packets through the processor in a fully pipelined way; therefore, we do not need to buffer the packet payloads during processing.
+However, other applications may necessitate the storage of packets, such as if the output data rate does not match the input data rate.
+One such example is ``video over IP'' where video pixels are transmitted over IP protocol~\cite{altera_voip}.
+In such cases, we often only need the packet header for immediate processing, while the packet payload is transmitted unchanged.
+
+We can use our embedded NoC to connect to the FPGA's memory interfaces and use a tagging system to store packet payloads off-chip while the header is being processed.
+At transceiver inputs, each packet is assigned a tag which is attached to both the packet header (which remains on-chip) and payload (that is stored off-chip).
+A simple storage controller at the external memory interface stores each tag and its external memory address.
+After the header is done processing, it requests the payload data from external memory, which is re-joined with the header at the output transceiver.
+We aim to better explore designs that require such storage in our future work.

@@ -1,0 +1,117 @@
+
+
+External memory interfaces, especially to DDRx memory, are some of the most important and highest bandwidth I/O interfaces on FPGAs.
+In this section we show how an IOLink can improve both the latency and area-utilization of external memory interfaces.
+
+%
+%--------------------------------------
+\subsubsection{Memory Interface Components}
+%--------------------------------------
+%
+
+%
+\figvs{0.95}{ddrx_block}{}{Block diagram of a typical DDRx memory interface in a modern FPGA.}
+%
+
+Fig.~\ref{ddrx_block} shows a typical FPGA external memory interface.
+The PHY is used mainly for clocking, data alignment and calibration of the clock and data delays for reliable operation, and to translate double-rate data from memory to single-rate data on the FPGA.
+In modern FPGAs, especially the ones that support fast memory transfers, the PHY is typically embedded in hard logic.
+%The PHY presents a \textit{standard} protocol called DFI to the next part of the external memory interface; the memory controller.
+
+The memory controller (see Fig.~\ref{ddrx_block}) is in charge of higher-level memory interfacing.
+This includes regularly refreshing external memory; %and computing ECC if that option is enabled.
+additionally, addresses are translated into bank, row and column components, which allows the controller to issue the correct memory access command based on the previously accessed memory word.
+%Importantly, memory controllers also optimize the order of commands to external memory, to minimize the number of costly accesses.
+%An example optimization is the coalescing of memory commands that access the same memory bank or row, thus avoiding costly switches between different memory banks or rows~\cite{xemif}.
+The memory controller is sometimes implemented hard and sometimes left soft, but the trend in new devices is to harden the memory controller to provide an out-of-the-box working memory solution~\cite{emif}.
+Some designers may want to implement their own high-performance memory controllers to exploit patterns in their memory accesses for instance, therefore, FPGA vendors also allow direct connection to the PHY, bypassing the hard memory controller.
+However, hard memory controllers are more efficient and much easier to use making it a more compelling option, especially as FPGAs start being used by software developers (in the context of high-level synthesis and data center computing) who do not have the expert hardware knowledge to design a custom memory controller.
+
+The final component of a memory interface is the multi-ported front end (MPFE).
+This component allows access to a single external memory by multiple independent modules.
+It consists primarily of FIFO memory buffers to support burst transfers and arbitration logic to select among the commands bidding for memory access.
+The MPFE is also sometimes hardened on modern FPGAs.
+Beyond the MPFE, a soft bus is required to distribute memory data across the FPGA to any module that requires it.
+
+%
+%--------------------------------------
+\subsubsection{Rate Conversion}
+%--------------------------------------
+%
+
+One of the functions of an FPGA memory controller is rate conversion.
+This basically down-converts the data frequency from the high memory frequency (\til1~GHz) to a lower FPGA-compatible frequency (\til200~MHz).
+All modern memory controllers in FPGAs operate at quarter rate; meaning, the memory frequency is down-converted 4\xx and memory width is parallelized eightfold\footnote{Width is multiplied by 8 during quarter-rate conversion because DDRx memory data operates at double rate (both positive and negative clock edges) while the FPGA logic is synchronous to either a rising or falling clock edge}.
+Modern FPGA DDR4 memory speeds go up to 1333~MHz (in Xilinx Ultrascale+ for example~\cite{xemif}); at quarter rate, this translates to 333~MHz in the FPGA fabric which is challenging to achieve.
+Quarter-rate conversion is \textit{necessary} to be able to use fast DDRx memory on current FPGAs -- how else can we transport and process fast memory data at the modest FPGA speed?
+However, there are both performance and efficiency disadvantages that arise due to quarter-rate conversion in the memory controller.
+
+\textbf{Area Overhead:} Down-converting frequency means up-converting data width from 128-bits (at single data rate) to 512-bits.
+This 4\xx difference increases the area utilization of the memory controller, the MPFE (including its FIFOs), and any soft bus that distributes memory data on the FPGA.
+
+\textbf{Latency Overhead:} Operating at the lower frequency increases memory transfer latency.
+This is mainly because each quarter-rate clock cycle is much slower (4\xx slower) than a full-rate equivalent.
+
+%
+%--------------------------------------
+\subsubsection{Proposed IOLink}
+%--------------------------------------
+%
+
+We propose directly connecting an NoC link to I/O interfaces.
+For the external memory interface, we propose connecting an IOLink to the AXI port after the hard memory controller (see Fig.~\ref{ddrx_block}).
+We also propose implementing a memory controller that supports full-rate memory operations, even at the highest memory speeds.
+This topology leverages the high speed and efficiency of a full-rate controller, and avoids the costly construction of a MPFE and soft bus to transport the data.
+Instead, an efficient embedded NoC fulfills the function of both the MPFE and soft bus in buffering and transporting DDRx commands and data, furthermore, it does so at full-rate memory speed and lower latency.
+
+Table~\ref{lat_comp_emif} details the latency breakdown of a memory read transaction when fulfilled by a current typical memory interface, and an estimate of latency when an embedded NoC is connected directly to a full-rate memory controller.
+We use the latency of the memory chip, PHY and controller from Altera's datasheets~\cite{emif}.
+For the MPFE, we estimate that it will take at least 2 system clock cycles\footnote{We define a ``system clock cycle" to be equivalent to the quarter-rate speed of the memory controller in our examples.} (equivalent to 8 memory clock cycles) to buffer data in a burst adapter and read it back out -- this is a very conservative estimate on the latency of a hard MPFE.
+To evaluate the soft bus, we generate buses in Altera's Qsys system integration tool with different levels of pipelining.
+Only highly pipelined buses (3-5 stages of pipelining) can achieve timing closure for a sample 800~MHz memory speed (200~MHz at quarter rate)~\cite{micro}.
+The round-trip latency of these buses in the absence of any traffic is 6-11 system clock cycles (depending on the level of pipelining).
+
+To estimate the embedded NoC latency in Table~\ref{lat_comp_emif}, we used the zero-load latency from Fig.~\ref{zl_latency}.
+The round-trip latency consists of the input FabricPort latency, the output FabricPort latency and twice the link traversal latency.
+At a 300~MHz fabric (system) frequency, FabricPort input latency is \til2 cycles, FabricPort output latency is 3 cycles and link traversal latency ranges between 1.5-6 cycles depending on the number of routers traversed.
+This adds up to a round-trip latency between 8-17 system clock cycles.
+
+%
+
+\renewcommand{\arraystretch}{1.25}
+\begin{table}[!t]
+\centering
+    \caption{Read transaction latency comparison between a typical FPGA quarter-rate memory controller, and a full-rate memory controller connected directly to an embedded NoC link. Latency is measured in full-rate memory clock cycles.}
+    \label{lat_comp_emif}
+\begin{tabular}{lc|lc}
+    \toprule
+    \multicolumn{2}{c|}{Current System}&\multicolumn{2}{|c}{NoC-Enhanced System}\\
+    \toprule
+    Component                 & Latency & Component              & Latency \\
+    \midrule
+	Memory                    & 5-11     & Memory                 & 5-11    \\
+    PHY ($\frac{1}{4}$-rate)        & 22-28    & PHY (full-rate)        & 4       \\
+	Controller ($\frac{1}{4}$-rate) & 28       & Controller (full-rate) & 15      \\
+    \hline
+    MPFE                      &  $>$8    & MPFE                   &   --     \\
+    \hline
+    Soft Bus                  &  24-44   & Hard NoC               & 32-68    \\
+    \hline
+    Total                     & 87-119   & Total                  & 56-98   \\
+    \hline
+    \multicolumn{4}{c}{Speedup = 1.2--1.6\xx}\\
+    \bottomrule
+\end{tabular}
+\end{table}
+\renewcommand{\arraystretch}{1}
+%
+
+As Table~\ref{lat_comp_emif} shows, the embedded NoC can improve latency by approximately 1.2--1.6\xx.
+Even though the embedded NoC has a higher round-trip latency compared to soft buses, latency improves because we use a full-rate memory controller, and avoid a MPFE.
+We directly transport the fast memory data using an NoC link, and only down-convert the data at a FabricPort output at the destination router where the memory data will be consumed.
+This undoubtedly reduces area utilization as well.
+More importantly, an embedded NoC avoids time-consuming timing closure iterations when connecting to an external memory interface, and improves area and power as shown in prior work~\cite{micro}.
+%In prior work, we quantified the efficiency and productivity gains of using an embedded NoC compared to a soft bus in connecting to external memory interfaces~\cite{micro}.
+
+%
+%

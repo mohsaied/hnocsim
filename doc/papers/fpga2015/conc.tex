@@ -1,0 +1,15 @@
+%
+%
+
+We proposed augmenting FPGAs with an embedded NoC and focused on how to use the NoC for transporting data in FPGA applications of different design styles.
+The FabricPort is a flexible interface between the embedded NoC and the FPGA's core; it can bridge any fabric frequency and data width up to 600~bits to the faster but narrower NoC at 1.2~GHz and 150~bits.
+We have shown that latency-insensitive systems can be interconnected using an embedded NoC with lower hardware overhead by taking advantage of the NoC's built-in buffering.
+Additionally, we showed how latency-sensitive systems can be guaranteed fixed delay and throughput through the NoC by using Permapaths.
+
+We investigated two streaming applications; latency-sensitive JPEG that only requires wires between modules, and a latency-insensitive Ethernet switch that requires heavy arbitration and switching between its transceiver modules.
+With an embedded NoC, JPEG's frequency can be improved by 10--80\%\comment{ compared to the FPGA's traditional interconnect with and without pipelining}.
+Wire utilization is also improved, as the embedded NoC avoids wiring hotspots and reduces the use of scarce long wires by 40\% at the expense of a 10\% increase of the much more plentiful short wires.
+Finally, we showed that high-bandwidth Ethernet switches can be efficiently constructed on the FPGA; by leveraging an embedded NoC we created an 819~Gb/s programmable Ethernet switch -- a major improvement over the 160~Gb/s achieved by prior work in a traditional FPGA.
+
+%
+%

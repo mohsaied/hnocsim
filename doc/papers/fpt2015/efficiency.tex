@@ -1,0 +1,85 @@
+%
+\comment{
+
+1. Want to compare to Brebner's 400G FPGA packet parser to highlight how we take better advantage of the FPGA platform
+2. Quote Horowitz paper's claimed limitations of FPGAs
+3. We first remove the processing functions of our design to stick only to parsing in order to do a fair comparison --> stick to the fields listed as parsed in the Brebner paper
+4. Also synthesize the full processor design
+5. We synthesize on a Stratix V-GS
+6. Convert Brebner's Virtex 7-870HT numbers to Stratix V-GS
+7. Show how our design is significantly more efficient, but the degree to which it is better diminishes as the design grows
+8. Not surprising, since our design is based on a "only use what you need" principle, whereas the PP design requires an established pipeline of tables to be present regardless of the complexity of the parser
+
+}
+%
+
+The PP packet processor design maintains OpenFlow's cascade of flow tables architecture, despite using an FPGA.
+OpenFlow's flow table design was created to add programmability to ASIC-based network infrastructures.
+Bosshart \textit{et al.} argue that FPGA's are poorly suited for such an architecture, as they offer far lower total memory capacity compared to their RMT chip design~\citep{bosshart2013forwarding}.
+Using this argument, the authors rule out FPGA technology for programmable packet processors.
+We argue that an FPGA can overcome its memory limitations by using our module-based NoC-PP architecture that significantly reduces the design's reliance on memory.
+
+To demonstrate this, we measure the hardware cost and performance of the NoC-PP design and compare it to Attig and Brebner's PP design.
+PP, however, only provides packet parsing functionality.
+It extracts fields from the packets but does not perform any form of action after the extraction, besides determining where the next header is located.
+Consequently, we also synthesized a modified version of the NoC-PP design that only contains parsing functionality, thus providing a fair comparison.
+We compare to two versions of the PP design: (1) the smallest, ``JustEth'', which only performs parsing on the Ethernet header, and (2) one of their biggest, ``TcpIp4andIp6'', which performs parsing on Ethernet, IPv4, IPv6 and TCP~\cite{attig2011400}.
+
+Table~\ref{tbl:results} contains hardware cost and performance results of the NoC-PP and the PP designs.
+Hardware cost is measured using resource utilization as a percentage of an Altera Stratix V-GS FPGA.
+Attig and Brebner's experimental results, originally presented as a percentage of a Xilinx Virtex-7 870HT FPGA, are converted to equivalent Stratix V-GS numbers.
+To perform this conversion, we use equivalent logic element/logic cell counts on each device, which we have found to accurately reflect the logic capacity for both vendors across a large number of designs.
+The resource utilization results for the NoC-PP design also include the resources consumed by RAM blocks and the embedded NoC~\cite{abdelfattah2015take}.
+The table also contains results for the full packet processor described in Section~\ref{sec:design-example} at 400G and 800G, referred to as ``TcpIp4Ip6-Processor'' (illustrated in Figure~\ref{noc-pp}).
+Figure~\ref{800G-floorplan} shows the floorplan of the FPGA with the synthesized 800G TcpIp4Ip6-Processor design.
+
+
+\begin{table}[t]
+\center
+\caption{Comparison of the NoC-PP and PP architectures}
+\begin{tabular}{lllll}
+\toprule
+ \textbf{Application} & \textbf{Architecture} & \textbf{Resource} & \textbf{Latency} & \textbf{Throughput} \\
+ & & \textbf{Utilization} & \textbf{(ns)} & \textbf{(Gb/s)} \\
+ & & \textbf{(\% FPGA)} & & \\
+\midrule
+\multirow{2}{*}{JustEth} &  NoC-PP  & 3.6\%  & 79 & 410 \\
+                         &  \cellcolor{gray!25}PP~\cite{attig2011400}      & \cellcolor{gray!25}11.6\% & \cellcolor{gray!25}293 & \cellcolor{gray!25}343 \\
+\midrule
+\multirow{2}{*}{TcpIp4Ip6} &  NoC-PP  & 9.4\%  & 200 & 410 \\
+                           &  \cellcolor{gray!25}PP~\cite{attig2011400}      & \cellcolor{gray!25}15.6\% & \cellcolor{gray!25}309 & \cellcolor{gray!25}325 \\
+\midrule
+TcpIp4Ip6        &  \multirow{3}{*}{NoC-PP}  & \multirow{3}{*}{14.4\%}  & \multirow{3}{*}{230} & \multirow{3}{*}{410} \\
+-Processor & & & & \\
+(400G) & & & & \\
+\midrule
+TcpIp4Ip6        &  \multirow{3}{*}{NoC-PP}  & \multirow{3}{*}{25.8\%}  & \multirow{3}{*}{232} & \multirow{3}{*}{819} \\
+-Processor & & & & \\
+(800G) & & & & \\
+\bottomrule
+\end{tabular}
+\label{tbl:results}
+\end{table}
+
+\figvs{0.9}{800G-floorplan}{}{Floorplan of the 800G NoC-PP ``TcpIp4Ip6-Processor'' design synthesized on a Stratix-V FPGA. The orange rectangles indicate the reserved partitions used to emulate the embedded NoC. The black regions are unused area on the chip. Note that the coloured logic blocks may be only partially filled.}
+
+%\begin{figure}[!t]
+%\centering
+%\includegraphics[width=#1\columnwidth,keepaspectratio,#3]{figs/#2}
+%\caption{#4}
+%\label{#2}
+%\end{figure}
+
+Overall, the NoC-PP proves to be more resource efficient and achieves better performance compared to the PP architecture.
+Interestingly, the degree to which NoC-PP is more resource efficient varies depending on the application.
+For the smaller application (JustEth), the NoC-PP design is 3.2$\times$ more efficient, whereas for the larger application (TcpIp4Ip6), it is 1.7$\times$ more efficient.
+This can be explained by the ``only use what you need'' design policy of NoC-PP: processing modules are dedicated to a single protocol and only included in the design if the processor must support that protocol.
+In contrast, the PP design is based on a pipeline of match tables that must be included no matter how few protocols need to be supported.
+The match table overhead is the main reason why the PP design is significantly less efficient compared to NoC-PP.
+Furthermore, NoC-PP also reduces latency by 3.7$\times$ and 1.5$\times$ compared to PP for JustEth and TcpIp4Ip6, respectively.
+Table~\ref{tbl:results} also shows that our full-featured packet processor is still more efficient than the more basic packet parser presented in prior work.
+Lastly, it is worth noting that the 800G design achieves a throughput greater than any previously reported packet processor built from an FPGA.
+Thus, the module-based NoC-PP architecture provides significant advantages for FPGA packet processors.
+
+
+

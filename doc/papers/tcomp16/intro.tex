@@ -1,0 +1,92 @@
+
+\IEEEPARstart{F}{ield}-programmable gate-arrays (FPGAs) are an effective compute acceleration platform for datacenter~\cite{Putnam2014} and networking~\cite{lockwood} applications.
+Besides the configurable FPGA fabric, modern FPGAs contain floating-point arithmetic units, embedded processor cores, and hard controllers for external memory, PCIe and Ethernet~\cite{Langhammer15}.
+These embedded resources greatly enhance FPGA computation and data transfer through I/Os; however, on-chip communication has been little developed in the past two decades.
+The traditional FPGA interconnect consists of wire segments and switches.
+While this is very flexible in creating custom fine-grained connections, it is inefficient for constructing wide buses for high-bandwidth data transfer across the chip.
+
+%
+\figfull{1.85}{noc_vs_bus}{}{System-level interconnection on FPGAs with soft buses or an embedded NoC.}
+%
+
+Fig.~\ref{noc_vs_bus} illustrates a sample FPGA application that is connected using a soft multiplexed bus, created using the FPGA's traditional interconnect and logic fabric.
+To create wide connections that are typically hundreds of bits wide, each bit is stitched together from the FPGA's wire segments and configurable interconnect switches.
+Additionally, the soft FPGA logic fabric is used to create multiplexers or crossbars to switch data between multiple application modules.
+These buses are difficult to design for many reasons.
+The physical size of the bus is only known after a design is completed; consequently, its area and power consumption -- which are typically large~\cite{tvlsi} -- and speed are unpredictable until the very last stages of compilation.
+As FPGAs scale to larger capacities, and wire speed deteriorates~\cite{Ho2001}, it is more challenging to design a bus that meets the speed requirements of FPGA applications, especially the stringent timing requirements of high speed I/O interfaces like external memory.
+If the soft bus does not meet the application's speed targets, time-consuming design patches are required to add pipeline registers or rethink the bus architecture to make it fast enough.
+Since FPGA applications take hours or days for synthesis, placement and routing, these timing closure iterations are very inefficient and greatly hamper design productivity with FPGAs~\cite{micro}.
+New FPGAs now contain pipeline registers in their programmable interconnect which makes timing closure much easier~\cite{stratix10}; however, designers must still redesign their system-level interconnect to suit each new application or FPGA device.
+%By abstracting system-level communication by using an embedded NoC.
+%Finally, soft buses are application- and FPGA device- specific and have to be redesigned for every new application or device.
+
+These limitations of soft buses are a barrier to FPGA adoption in mainstream computing; therefore, our goal is to abstract system-level communication using an embedded network-on-chip (NoC) as shown in Fig.~\ref{noc_vs_bus}.
+By prefabricating the NoC, its speed is known before design compilation thus mitigating or eliminating timing closure iterations.
+Additionally, the embedded NoC uses less area and power compared to soft buses for most FPGA applications~\cite{tvlsi,micro}.
+An embedded NoC improves design portability across different applications or devices since the system-level interconnect becomes built into the FPGA, and the application designer needs only to focus on creating the application kernels.
+Importantly, an NoC decouples the application's computation and communication logic.
+This improves design modularity, relaxes placement and routing constraints, and enables the independent optimization and compilation of application modules, which is bound to improve performance.
+Better FPGA design modularity can also lead to easier parallel compilation and partial reconfiguration flows.
+
+
+%The unique FPGA challenge is that we do not know the location, size, bandwidth requirements of applications at manufacturing time.
+To reap the potential benefits of embedded NoCs without losing configurability -- the hallmark of FPGAs -- we propose flexible interfaces between the embedded NoC and the FPGA fabric and I/Os.
+Furthermore, we define rules that make FPGA design styles compatible with the embedded NoC.
+We also present four application case studies to highlight the utility of an embedded NoC in important and diverse FPGA applications.
+To this end, we make the following contributions:%\footnote{Contributions 1, 3, 6 and 7 have been previously published in a conference paper~\cite{fpga}.}:
+
+\begin{enumerate}
+\item Present the FabricPort: a flexible interface between the FPGA fabric and a packet-switched embedded NoC.
+\item Present IOLinks: direct connections between the embedded NoC and the FPGA's memory and I/O controllers.
+\item Enumerate the conditions for semantically correct FPGA communication using the embedded NoC. %We discuss both latency-sensitive and -insensitive design styles.
+\item Present \rtlbook: allowing the co-simulation of a software NoC simulator and hardware RTL designs.
+\item Compare the latency of external memory access with an embedded NoC (with IOLink) or a soft bus.
+\item Analyze latency-sensitive parallel JPEG compression both with and without an embedded NoC.
+\item Design an Ethernet switch with 5\xx more bandwidth at 3\xx less area compared to previous FPGA switches.
+\item Design a more flexible and efficient FPGA packet processor using the embedded NoC.
+\end{enumerate}
+
+
+
+\comment{
+\IEEEPARstart{F}{ield}-programmable gate-arrays (FPGAs) are increasing in both capacity and heterogeneity.
+Over the past two decades, FPGAs have evolved from a chip with thousands of logic elements (and not much else) to a much larger chip that has millions of logic elements, embedded memory, multipliers, processors, memory controllers, PCIe controllers and high-speed transceivers~\cite{xilinx_datasheets}.
+This incredible increase in size and functionality has pushed FPGAs into new markets and larger and more complex systems~\cite{Putnam2014}.
+
+
+\hl{change intro - take from thesis if possible}
+
+Both the FPGA's logic and I/Os have had efficient embedded units added to enhance their performance; however, the FPGA's interconnect is still basically the same.
+Using a combination of wire segments and multiplexers, a single-bit connection can be made between any two points on the FPGA chip.
+While this traditional interconnect is very flexible, it is becoming ever-more challenging to use in connecting large systems.
+Wire-speed is scaling poorly compared to transistor speed~\cite{Ho2001}, and a larger FPGA device means that a connection often consists of multiple wire segments and multiplexers thus increasing overall delay.
+This makes it difficult to estimate the delay of a connection before placement and routing, forcing FPGA designers to wait until design compilation is completed, then identify the critical path and manually add pipeline registers in an attempt to improve frequency -- a time-consuming process.
+Furthermore, the high bandwidth of embedded I/O interfaces requires fast and very wide connections that distribute data across the whole chip.
+This utilizes much FPGA logic and a multitude of its single-bit wires and multiplexers; consequently, it is difficult to run these wide connections fast enough to satisfy the stringent delay constraints of interfaces like DDR3.
+
+
+%
+%\figvs{1}{router}{}{Embedded hard NoC connects to the FPGA fabric and hard I/O interfaces.}
+%
+
+
+System-level interconnect has been proposed to augment the FPGA's bit-level interconnect to better integrate large systems.
+Some have suggested the use of bus-based FPGA interconnect to save area~\cite{Ye2006}, while others have investigated embedded NoCs~\cite{micro, Francis2008, Goossens2008}.
+In this work we focus on the latter; specifically, how to interface the FPGA fabric to an embedded NoC, and how to use an embedded NoC for different design styles that are common to FPGAs.
+Previous work has investigated how to use an embedded NoC to create a multiprocessor-like memory abstraction for FPGAs~\cite{Chung2011}.
+In contrast, we focus on \textit{adapting} an embedded NoC to the currently used FPGA design styles.
+To this end, we make the following contributions:
+%
+%
+\begin{enumerate}
+\item Present the FabricPort: a flexible interface between the FPGA fabric and a packet-switched embedded NoC.
+\item Investigate the requirements of mapping the communication of different design styles (latency-insensitive and latency-sensitive) onto an embedded NoC.
+\item Analyze latency-sensitive parallel JPEG compression both with and without an embedded NoC.
+\item Design an Ethernet switch capable of 819~Gb/s using the embedded NoC; 5\xx more switching than previously demonstrated on FPGAs.
+\end{enumerate}
+%
+}
+
+%
+%

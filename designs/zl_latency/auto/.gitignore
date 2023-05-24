@@ -1,0 +1,3 @@
+rpts/*.txt
+*.txt
+testbench_simple_fabric.sv

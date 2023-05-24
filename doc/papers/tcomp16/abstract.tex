@@ -1,0 +1,33 @@
+%
+%
+\comment{
+\hl{change abstract to reflect new material}
+Embedded logic and I/O interfaces have made field-programmable gate-arrays (FPGAs) more capable platforms for implementing large systems.
+We explore the addition of a fast embedded network-on-chip (NoC) to augment the FPGA's existing wires and switches, and help interconnect large applications.
+A flexible interface between the FPGA fabric and the embedded NoC allows modules of varying widths and frequencies to transport data over the NoC.
+We study both latency-insensitive and latency-sensitive design styles and present the constraints for implementing each type of communication on the embedded NoC.
+%
+%
+By augmenting field-programmable gate-arrays (FPGAs) with embedded computation, memory and I/O elements, they have become an efficient platform for compute acceleration and networking applications.
+However, implementing on-chip communication is still a designer's burden where custom system-level communication buses are implemented using the fine-grained FPGA logic and interconnect fabric.
+We propose augmenting FPGAs with an embedded network-on-chip (NoC) to implement system-level communication.
+We design custom interfaces to connect a conventional packet-switched NoC to the FPGA fabric and I/Os in a configurable and efficient way.
+We then define the necessary rules and constraints to implement FPGA design styles correctly and efficiently using an embedded NoC -- this lays the foundations upon which we can implement applications using a NoC-enhanced FPGA.
+In the second half of this paper, we present four application case studies that highlight the advantages of using an embedded NoC.
+We show that access-latency to external memory can be \til1.5\xx lower.
+Our application case study with image compression shows that an embedded NoC improves frequency by 10--80\%, reduces utilization of scarce long wires by 40\% and makes design easier and more predictable.
+Additionally, we leverage the embedded NoC in creating a programmable Ethernet switch that can support up to 819~Gb/s compared to previous work that only demonstrated 160~Gb/s.
+Finally we design a 400~Gb/s packet processor based on our embedded NoC, that is more flexible and efficient compared to other packet processor designs.
+}
+%
+%By augmenting field-programmable gate-arrays (FPGAs) with embedded computation, memory and I/O elements, they have become an efficient platform for compute acceleration and networking applications.
+Field-programmable gate-arrays (FPGAs) have evolved to include embedded memory, high-speed I/O interfaces and processors, making them both more efficient and easier-to-use for compute acceleration and networking applications.
+However, implementing on-chip communication is still a designer's burden wherein custom system-level buses are implemented using the fine-grained FPGA logic and interconnect fabric.
+Instead, we propose augmenting FPGAs with an embedded network-on-chip (NoC) to implement system-level communication.
+We design custom interfaces to connect a packet-switched NoC to the FPGA fabric and I/Os in a configurable and efficient way and then define the necessary conditions to implement common FPGA design styles with an embedded NoC.
+Four application case studies highlight the advantages of using an embedded NoC.
+We show that access latency to external memory can be \til1.5\xx lower.
+Our application case study with image compression shows that an embedded NoC improves frequency by 10--80\%, reduces utilization of scarce long wires by 40\% and makes design easier and more predictable.
+Additionally, we leverage the embedded NoC in creating a programmable Ethernet switch that can support up to 819~Gb/s -- 5\xx more switching bandwidth and 3\xx lower area compared to previous work.
+Finally, we design a 400~Gb/s NoC-based packet processor that is very flexible and more efficient than other FPGA-based packet processors.
+%

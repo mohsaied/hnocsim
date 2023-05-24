@@ -1,0 +1,38 @@
+
+\comment{
+The conventional way to do this entails RTL hardware simulations using a simulator like Mentor Graphics' Modelsim.
+Designs are entered to these simulators using a HDL such as Verilog, SystemVerilog or VHDL.
+Therefore, we would need an HDL version of our NoC and FabricPort to properly simulate an embedded NoC.
+Furthermore, the HDL implementation of the NoC would have to be parametrizable (to be able to try out different NoCs) and fully verified (to avoid errors).
+We first tried borrowing such an open-source implementation~\cite{becker_router}, but we quickly found it very hard to use.
+Other than the intermittent bugs that we discovered, it was very challenging to properly match the interface of the NoC with our FabricPort.
+This is because every time we changed an NoC parameter, the packet format became noticeably different.
+}
+
+To measure application performance, in terms of latency and throughput, we need to perform cycle-accurate simulations of hardware designs that use an NoC.
+However, full register-transfer level (RTL) simulations of complex hardware circuits like NoCs are error-prone and slow.
+Instead of using a hardware description language (HDL) implementation of the NoC, we used a cycle-accurate software simulator of NoCs called Booksim~\cite{booksim}.
+This is advantageous because Booksim provides the same simulation cycle-accuracy, but runs faster than an HDL model of the NoC, and supports more NoC variations.
+Additionally, we are able to define our own packet format which greatly simplifies the interface to the NoC.
+Finally, it is much easier to extend Booksim with a new router architecture or special feature, making it a useful research tool in fine-tuning the NoC architecture.
+
+%
+\figvs{1}{rtl2booksim}{}{\rtlbook{ }allows the cycle-accurate simulation of an NoC within an RTL simulation in Modelsim.}
+%
+
+Booksim conventionally simulates an NoC from a trace file that describes the movement of packets in an NoC.
+However, our FabricPort and applications are written in Verilog (an HDL).
+How do we connect our hardware Verilog components to a software simulator such as Booksim?
+We developed \rtlbook{ } to interface HDL designs to Booksim; Fig.~\ref{rtl2booksim} shows some details of this interface.
+
+The Booksim Interface is able to send/receive flits and credits to/from the NoC modeled by the Booksim simulator through Unix sockets.
+Next, there is an RTL Interface that communicates with our RTL HDL design modules.
+The RTL Interface communicates with the Booksim Interface through a feature of the SystemVerilog language called the direct programming interface (DPI).
+SystemVerilog DPI basically allows calling software functions written in C/C++ from within a SystemVerilog design file.
+Through these two interfaces -- the Booksim Interface and the RTL interface -- we can connect any hardware design to any NoC that is modeled by Booksim.
+%As Fig.~\ref{rtl2booksim} shows, we can configure the NoC using a configuration file.
+%This Booksim configuration file is very easy to use since it simply consists of a list of NoC parameters.
+%We made sure to have a simple HDL NoC wrapper so that it acts exactly like an HDL NoC in an RTL simulation.
+%The NoC wrapper contains data, ready and valid signals for each router input and output and is therefore straightforward to use.
+\rtlbook{ }is released as open-source and available for download at: \url{http://www.eecg.utoronto.ca/~mohamed/rtl2booksim}.
+The release includes push-button scripts that correctly start and end simulation for example designs using Modelsim and \rtlbook.

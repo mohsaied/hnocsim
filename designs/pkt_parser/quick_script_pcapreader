@@ -1,0 +1,30 @@
+#!/bin/bash
+
+export PATH=$PATH:/home/andrew/altera/13.1/modelsim_ase/bin
+
+rm -rf work
+vlib work
+
+#compile verilog files
+vlog avalon_st_interface.sv
+vlog pcapreader64.sv
+vlog pcapreader_testbench.sv
+
+#run sim
+
+if [ "$1" == "vsim" ]; then
+    vsim -L /home/andrew/altera/13.1/modelsim_ase/altera/verilog/altera_mf pcapreader_testbench -do wave1.do
+else
+    vsim -L /home/andrew/altera/13.1/modelsim_ase/altera/verilog/altera_mf -c pcapreader_testbench -do "run -all"
+fi
+
+#cleanup
+
+killall vsimk
+killall vsim
+killall vish
+
+rm -r work
+rm transcript
+rm *.out
+rm *.o *.so *.wlf *.vstf

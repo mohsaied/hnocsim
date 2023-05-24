@@ -1,0 +1,7 @@
+
+We use \texttt{\textbf{RTL2Booksim}}~\cite{fpl15demo} to connect the packet processing modules to the embedded NoC, and perform a cycle-accurate simulation in ModelSim. 
+This allows us to gather our performance data in cycle counts; however, we also need to find the operating frequency of our packet processing modules to be able to quantify the overall performance of NoC-PP.
+Furthermore, we want to realistically model any physical design consequences of connecting these packet processing modules to embedded routers (such as interconnection choke-points or possible frequency degradation).
+To do so, we emulate the existence of routers in an Altera FPGA (Stratix V 5SGSED8K1F40C2) by creating 16 design partitions -- one for each router -- that have the same size, location and interconnection flexibility as an embedded router.
+We then connect our packet processing modules to them the same way they are connected in NoC-PP and compile the design in Quartus II v14.0 to collect the area and frequency results presented in this section.
+

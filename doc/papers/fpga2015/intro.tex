@@ -1,0 +1,68 @@
+%
+%
+\comment{
+\begin{itemize}
+	\item outline our previous study of NoCs - what are the efficiency gains that we get.
+	\item say that a big question remains unanswered: how do we actually design using that NOC.
+	\item we need to know what guarantees can we make? how does it fit in FPGA design? what guarantees can we make? how to simulate designs efficiently?
+	\item previous work shows that a full-featured NoC can (1) reduce area/power consumption on FPGAs (2) simplify design especially timing closure because interconnects aren't scaling that well anymore.
+	\item scarcely have people looked into how to interface an embedded hard NoC to the FPGA fabric -- we study this in detail and present the designs for a "FabricPort" that interfaces the two.
+	\item we also discuss how a full-featured packet-switched NoC (1\% of FPGA area) can be adapted to specifically cater to FPGA designs, why other forms of system-interconnect may not be as suitable.
+	\item discuss VCs, VC facilitator, routing algos, buffer sizing.
+	\item dally and towles identify two main uses of NoCs as (1) processor-memory communication: this is basically moving cache lines in a homogeneous or heterogenous memory-mapped system, or (2) switch fabric where an NoC acts as one big router.
+	\item however, FPGAs aren't typically used for memory-mapped communication, rather streaming data. Stream in --> processing --> stream out. examples are video/internet/packet/data-center/communications.
+	\item little or no previous work has looked into using NoCs for implementing streaming data. 
+	\item we also show that both latency-sensitive and latency-insenstive communicaiton can be mapped onto an NoC with predictable performance for the former type of interconnect.
+	\item we present a cycle-accurate simulation framework for NoCs to test applications with NoC as interconnect and measure latency/throughput performance.
+	\item we then present two (or more) applications and compare various metrics both when on or off the NoC.
+	\item applications are (1) switch fabric (2) latency-sensitive jpeg (3) latency-insensitive memory access
+\end{itemize}
+
+\hl{can compare to previous bus-based FPGA interconnect that didnt really take off -- how are we different and why is our solution better/more flexible.}
+
+%test citations
+Previous work has evaluated the area and energy efficiency gains of using embedded NoCs compared to building soft interconnect from the FPGA fabric~\cite{fpl,fpt,trets,micro}.
+
+\hl{the NoC is a new kind of FPGA interconnect resource that provides pipelining, switching, buffering and stallability. Try to convey this idea. We can use the first few things for latency insensitive/latency-sensitive design. The switching for switch fabrics and on-chip arbitration, the buffering helps in both. This is a very programmable resource and we'll show how best to connect to it, how to use it for different design styles, and how to leverage the NoCs resources in implementing different applications.}
+
+}
+
+
+Field-programmable gate-arrays (FPGAs) are increasing in both capacity and heterogeneity. 
+Over the past two decades, FPGAs have evolved from a chip with thousands of logic elements (and not much else) to a much larger chip that has millions of logic elements, embedded memory, multipliers, processors, memory controllers, PCIe controllers and high-speed transceivers~\cite{xilinx_datasheets}.
+This incredible increase in size and functionality has pushed FPGAs into new markets and larger and more complex systems~\cite{Putnam2014}.
+
+Both the FPGA's logic and I/Os have had efficient embedded units added to enhance their performance; however, the FPGA's interconnect is still basically the same.
+Using a combination of wire segments and multiplexers, a single-bit connection can be made between any two points on the FPGA chip.
+While this traditional interconnect is very flexible, it is becoming ever-more challenging to use in connecting large systems.
+Wire-speed is scaling poorly compared to transistor speed~\cite{Ho2001}, and a larger FPGA device means that a connection often consists of multiple wire segments and multiplexers thus increasing overall delay.
+This makes it difficult to estimate the delay of a connection before placement and routing, forcing FPGA designers to wait until design compilation is completed, then identify the critical path and manually add pipeline registers in an attempt to improve frequency -- a time-consuming process.
+Furthermore, the high bandwidth of embedded I/O interfaces requires fast and very wide connections that distribute data across the whole chip.
+This utilizes much FPGA logic and a multitude of its single-bit wires and multiplexers; consequently, it is difficult to run these wide connections fast enough to satisfy the stringent delay constraints of interfaces like DDR3.
+
+
+%
+\figvs{1}{router}{}{Embedded hard NoC connects to the FPGA fabric and hard I/O interfaces.}
+%
+
+System-level interconnect has been proposed to augment the FPGA's bit-level interconnect to better integrate large systems.
+Some have suggested the use of bus-based FPGA interconnect to save area~\cite{Ye2006}, while others have investigated embedded NoCs~\cite{micro, Francis2008, Goossens2008}.
+In this work we focus on the latter; specifically, how to interface the FPGA fabric to an embedded NoC, and how to use an embedded NoC for different design styles that are common to FPGAs.
+Previous work has investigated how to use an embedded NoC to create a multiprocessor-like memory abstraction for FPGAs~\cite{Chung2011}.
+In contrast, we focus on \textit{adapting} an embedded NoC to the currently used FPGA design styles.
+To this end, we make the following contributions:
+%
+\vspace{-0.1cm}
+%
+\begin{enumerate}
+\setlength\itemsep{-0.33mm}
+\item Present the FabricPort: a flexible interface between the FPGA fabric and a packet-switched embedded NoC.
+\item Investigate the requirements of mapping the communication of different design styles (latency-insensitive and latency-sensitive) onto an embedded NoC.
+\item Analyze latency-sensitive parallel JPEG compression both with and without an embedded NoC.
+\item Design an Ethernet switch capable of 819~Gb/s using the embedded NoC; 5\xx more switching than previously demonstrated on FPGAs.
+\end{enumerate}
+%
+
+
+%
+%

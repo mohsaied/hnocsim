@@ -1,0 +1,10 @@
+*.aux
+*.bbl
+*.log
+*.blg
+*.toc
+*.bcf
+
+designs_results
+fabric_port
+xbar

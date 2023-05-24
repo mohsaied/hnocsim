@@ -1,0 +1,20 @@
+%
+\comment{
+
+1. Header data beat added to allow vector of parsed fields to be created
+2. Header data beat also holds offset to tell processing module where in the header the protocol is located
+
+}
+
+Thus far, we have described a mechanism for processing protocols with modules that are independent of one another.
+However, packet processing requires at least some information to be passed from one protocol to another.
+As a bare minimum, information regarding where the next protocol's header is located in the packet is determined in the previous protocol header and therefore must be passed to the next protocol's processing module (see Figure~\ref{packet}).
+There are many other possible scenarios where information from a lower-level protocol may be used later in the processing stages.
+For example, in packet classification, a classification decision may be made after a combination of fields are parsed from each of the packet's headers.
+
+To provide a mechanism for information-passing between processing modules, the NoC-PP design adds a blank header flit to every packet upon entering the processor.
+This header flit can hold any combination of parsed fields from the packet as it proceeds through the processor.
+Data stored in the header flit are maintained across processing modules until they are overwritten.
+For example, our design stores a 7-bit ``data offset'' field in this header flit that is updated by every processing module.
+This field tells the next processing module where its header is located in the packet.
+The header flit is removed just before the packet exits the processor.

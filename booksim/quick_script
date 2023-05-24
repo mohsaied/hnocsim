@@ -1,0 +1,30 @@
+#!/bin/bash
+
+#remake booksim
+make
+
+#create work library
+rm -rf work
+vlib work
+
+#compile verilog files
+#vlog -dpiheader dpi.h rtl_interface.sv gen.sv testbench.sv
+vlog -dpiheader dpi.h rtl_interface.sv
+vlog  ../fabric_port/fabric_port_in/*.sv
+vlog  ../fabric_port/fabric_port_out/*.sv
+vlog fabric_interface.sv
+vlog testbench_simple_fabric.sv
+#vlog testbench_simple.sv
+
+#recompile the booksim socket interface
+g++ -c -fPIC -m32 -I/home/mohamed/altera/14.0/modelsim_ase/include booksim_interface.cpp
+g++ -shared -Bsymbolic -fPIC -m32 -o booksim_interface.so booksim_interface.o
+
+#run booksim 
+#gnome-terminal --window-with-profile=keep_open -e ./booksim\ sim_config
+gnome-terminal -e ./booksim\ sim_config
+
+#run simulation
+vsim -c -sv_lib booksim_interface testbench -do "run -all"
+#vsim -sv_lib booksim_interface testbench -do wave.do 
+

@@ -1,0 +1,15 @@
+/home/andrew/booksim2-master/src/gen.sv {1 {vlog -work work -sv /home/andrew/booksim2-master/src/gen.sv
+Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+-- Compiling module gen
+
+Top level modules:
+	gen
+
+} {} {}} /home/andrew/booksim2-master/src/testbench.sv {1 {vlog -work work -sv /home/andrew/booksim2-master/src/testbench.sv
+Model Technology ModelSim ALTERA vlog 10.1d Compiler 2012.11 Nov  2 2012
+-- Compiling module testbench
+
+Top level modules:
+	testbench
+
+} {} {}}

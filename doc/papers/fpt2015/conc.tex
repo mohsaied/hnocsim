@@ -1,0 +1,17 @@
+%
+%
+%
+%
+
+
+As network performance becomes ever more crucial to data processing and mobile applications, there is an ever-increasing demand on network infrastructures to evolve.
+The NoC-PP packet processor architecture proposed in this work focuses on maximizing hardware flexibility, thus providing a platform that is very amenable to network evolution.
+By using an FPGA augmented with an embedded NoC, we have proposed a modular packet processor design that is capable of being reprogrammed to support different combinations of actions and header field matches.
+Unlike ASIC-based OpenFlow architectures, it is not limited by the action set and table sizes fixed upon chip fabrication.
+Its flexibility significantly exceeds that of the RMT ASIC architecture, while matching, and even surpassing, its supported bandwidth (400G/800G vs. 640G).
+Compared to the best previously proposed FPGA-based packet processor, NoC-PP proves to be 1.7$\times$ and 3.2$\times$ more resource efficient, and achieves 1.5$\times$ and 3.7$\times$ lower latency on complex and simple applications, respectively.
+
+The NoC-PP architecture is only possible given the inclusion of a hardened NoC embedded into an FPGA.
+This hard NoC is both fast and small, enabling easy cross-chip communication.
+Though an embedded NoC has yet to be adopted in FPGAs, we hope that the compelling applications explored in this and previous work~\cite{abdelfattah2015take,bitar2014efficient} present a convincing case for its inclusion in future FPGA devices.
+Such a NoC-enhanced FPGA could revolutionize SDN by paving the way for a fully-programmable data plane.

@@ -1,0 +1,7 @@
+reports/*txt
+
+*.xlsx
+reports_*
+*.o
+*.so
+work

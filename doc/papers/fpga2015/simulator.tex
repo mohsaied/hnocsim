@@ -1,0 +1,17 @@
+%
+%
+\comment{
+\begin{itemize}
+	\item flexible simulator that interfaces modelsim to booksim so we can model any NoC we want on the booksim side and any design we want on modelsim side and still get cycle-accurate results.
+	\item interface sends flits and credits
+	\item uses systemverilog dpi interface and unix sockets to communicate between the two programs
+\end{itemize}
+}
+%
+%
+
+To evaluate the performance of embedded NoCs, we created \texttt{RTL2Booksim}\footnote{\texttt{RTL2Booksim} is available for download at \\\url{www.eecg.utoronto.ca/~mohamed/rtl2booksim.html}}: a simulation framework which allows the co-simulation of hardware description languages (HDL) such as Verilog and VHDL, and a widely-used cycle-accurate NoC simulator called Booksim~\cite{booksim}.
+
+
+%
+%

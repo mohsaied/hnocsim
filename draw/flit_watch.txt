@@ -1,0 +1,168 @@
+529 | node62 | Enqueuing flit 944 (packet 12) at time 529.
+545 | node62 | Injecting flit 944 into subnet 0 at time 545 with priority 0.
+546 | network_0/network_0_fchan_ingress62 | Beginning channel traversal for flit 944 with delay 1.
+546 | network_0/network_0_fchan_ingress62 | Completed channel traversal for flit 944.
+547 | network_0/router_7_6 | Received flit 944 from channel at input 4.
+547 | network_0/router_7_6 | Adding flit 944 to VC 0 at input 4 (state: active, front: 938).
+607 | network_0/router_7_6 | Beginning switch allocation for VC 0 at input 4 (front: 944).
+607 | network_0/router_7_6 |   Requesting output 3.0 (non-spec, pri: 0).
+607 | network_0/router_7_6/sw_allocator | Input requests = [ 4 -> [ 3@0 ]  ], output requests = [ 3 -> [ 4@0 ]  ].
+607 | network_0/router_7_6/sw_allocator | Input grants = [ 4 -> 3  ], output grants = [ 3 -> 4  ].
+607 | network_0/router_7_6 | Assigning output 3.0 to VC 0 at input 4.0.
+607 | network_0/router_7_6 | Completed switch allocation for VC 0 at input 4 (front: 944).
+607 | network_0/router_7_6 |   Scheduling switch connection from input 4.0 to output 3.0.
+608 | network_0/router_7_6 | Beginning crossbar traversal for flit 944 from input 4.0 to output 3.0.
+608 | network_0/router_7_6 | Completed crossbar traversal for flit 944 from input 4.0 to output 3.0.
+608 | network_0/router_7_6 | Buffering flit 944 at output 3.
+608 | network_0/router_7_6 | Sending flit 944 to channel at output 3.
+609 | network_0/network_0_fchan_251 | Beginning channel traversal for flit 944 with delay 1.
+609 | network_0/network_0_fchan_251 | Completed channel traversal for flit 944.
+610 | network_0/router_6_6 | Received flit 944 from channel at input 2.
+610 | network_0/router_6_6 | Adding flit 944 to VC 0 at input 2 (state: active, front: 939).
+615 | network_0/router_6_6 | Beginning switch allocation for VC 0 at input 2 (front: 944).
+615 | network_0/router_6_6 |   Requesting output 1.0 (non-spec, pri: 0).
+615 | network_0/router_6_6/sw_allocator | Input requests = [ 2 -> [ 1@0 ]  ], output requests = [ 1 -> [ 2@0 ]  ].
+615 | network_0/router_6_6/sw_allocator | Input grants = [ 2 -> 1  ], output grants = [ 1 -> 2  ].
+615 | network_0/router_6_6 | Assigning output 1.0 to VC 0 at input 2.0.
+615 | network_0/router_6_6 | Completed switch allocation for VC 0 at input 2 (front: 944).
+615 | network_0/router_6_6 |   Scheduling switch connection from input 2.0 to output 1.0.
+616 | network_0/router_6_6 | Beginning crossbar traversal for flit 944 from input 2.0 to output 1.0.
+616 | network_0/router_6_6 | Completed crossbar traversal for flit 944 from input 2.0 to output 1.0.
+616 | network_0/router_6_6 | Buffering flit 944 at output 1.
+616 | network_0/router_6_6 | Sending flit 944 to channel at output 1.
+617 | network_0/network_0_fchan_217 | Beginning channel traversal for flit 944 with delay 1.
+617 | network_0/network_0_fchan_217 | Completed channel traversal for flit 944.
+618 | network_0/router_6_5 | Received flit 944 from channel at input 0.
+618 | network_0/router_6_5 | Adding flit 944 to VC 1 at input 0 (state: active, empty).
+618 | network_0/router_6_5 | Beginning switch allocation for VC 1 at input 0 (front: 944).
+618 | network_0/router_6_5 |   Requesting output 1.0 (non-spec, pri: 0).
+618 | network_0/router_6_5/sw_allocator | Input requests = [ 0 -> [ 1@0 ]  ], output requests = [ 1 -> [ 0@0 ]  ].
+618 | network_0/router_6_5/sw_allocator | Input grants = [ 0 -> 1  ], output grants = [ 1 -> 0  ].
+618 | network_0/router_6_5 | Assigning output 1.0 to VC 1 at input 0.0.
+618 | network_0/router_6_5 | Completed switch allocation for VC 1 at input 0 (front: 944).
+618 | network_0/router_6_5 |   Scheduling switch connection from input 0.0 to output 1.0.
+619 | network_0/router_6_5 | Beginning crossbar traversal for flit 944 from input 0.0 to output 1.0.
+619 | network_0/router_6_5 | Completed crossbar traversal for flit 944 from input 0.0 to output 1.0.
+619 | network_0/router_6_5 | Buffering flit 944 at output 1.
+619 | network_0/router_6_5 | Sending flit 944 to channel at output 1.
+620 | network_0/network_0_fchan_213 | Beginning channel traversal for flit 944 with delay 1.
+620 | network_0/network_0_fchan_213 | Completed channel traversal for flit 944.
+621 | network_0/router_6_4 | Received flit 944 from channel at input 0.
+621 | network_0/router_6_4 | Adding flit 944 to VC 1 at input 0 (state: active, empty).
+621 | network_0/router_6_4 | Beginning switch allocation for VC 1 at input 0 (front: 944).
+621 | network_0/router_6_4 |   Requesting output 3.0 (non-spec, pri: 0).
+621 | network_0/router_6_4/sw_allocator | Input requests = [ 0 -> [ 3@0 ]  3 -> [ 2@0 ]  ], output requests = [ 2 -> [ 3@0 ]  3 -> [ 0@0 ]  ].
+621 | network_0/router_6_4/sw_allocator | Input grants = [ 0 -> 3  3 -> 2  ], output grants = [ 2 -> 3  3 -> 0  ].
+621 | network_0/router_6_4 | Assigning output 3.0 to VC 1 at input 0.0.
+621 | network_0/router_6_4 | Completed switch allocation for VC 1 at input 0 (front: 944).
+621 | network_0/router_6_4 |   Scheduling switch connection from input 0.0 to output 3.0.
+622 | network_0/router_6_4 | Beginning crossbar traversal for flit 944 from input 0.0 to output 3.0.
+622 | network_0/router_6_4 | Completed crossbar traversal for flit 944 from input 0.0 to output 3.0.
+622 | network_0/router_6_4 | Buffering flit 944 at output 3.
+622 | network_0/router_6_4 | Sending flit 944 to channel at output 3.
+623 | network_0/network_0_fchan_211 | Beginning channel traversal for flit 944 with delay 1.
+623 | network_0/network_0_fchan_211 | Completed channel traversal for flit 944.
+624 | network_0/router_5_4 | Received flit 944 from channel at input 2.
+624 | network_0/router_5_4 | Adding flit 944 to VC 1 at input 2 (state: active, empty).
+624 | network_0/router_5_4 | Beginning switch allocation for VC 1 at input 2 (front: 944).
+624 | network_0/router_5_4 |   Requesting output 3.0 (non-spec, pri: 0).
+624 | network_0/router_5_4/sw_allocator | Input requests = [ 2 -> [ 3@0 ]  3 -> [ 2@0 ]  ], output requests = [ 2 -> [ 3@0 ]  3 -> [ 2@0 ]  ].
+624 | network_0/router_5_4/sw_allocator | Input grants = [ 2 -> 3  3 -> 2  ], output grants = [ 2 -> 3  3 -> 2  ].
+624 | network_0/router_5_4 | Assigning output 3.0 to VC 1 at input 2.0.
+624 | network_0/router_5_4 | Completed switch allocation for VC 1 at input 2 (front: 944).
+624 | network_0/router_5_4 |   Scheduling switch connection from input 2.0 to output 3.0.
+625 | network_0/router_5_4 | Beginning crossbar traversal for flit 944 from input 2.0 to output 3.0.
+625 | network_0/router_5_4 | Completed crossbar traversal for flit 944 from input 2.0 to output 3.0.
+625 | network_0/router_5_4 | Buffering flit 944 at output 3.
+625 | network_0/router_5_4 | Sending flit 944 to channel at output 3.
+626 | network_0/network_0_fchan_179 | Beginning channel traversal for flit 944 with delay 1.
+626 | network_0/network_0_fchan_179 | Completed channel traversal for flit 944.
+627 | network_0/router_4_4 | Received flit 944 from channel at input 2.
+627 | network_0/router_4_4 | Adding flit 944 to VC 1 at input 2 (state: active, empty).
+627 | network_0/router_4_4 | Beginning switch allocation for VC 1 at input 2 (front: 944).
+627 | network_0/router_4_4 |   Requesting output 3.0 (non-spec, pri: 0).
+627 | network_0/router_4_4/sw_allocator | Input requests = [ 2 -> [ 3@0 ]  3 -> [ 2@0 ]  ], output requests = [ 2 -> [ 3@0 ]  3 -> [ 2@0 ]  ].
+627 | network_0/router_4_4/sw_allocator | Input grants = [ 2 -> 3  3 -> 2  ], output grants = [ 2 -> 3  3 -> 2  ].
+627 | network_0/router_4_4 | Assigning output 3.0 to VC 1 at input 2.0.
+627 | network_0/router_4_4 | Completed switch allocation for VC 1 at input 2 (front: 944).
+627 | network_0/router_4_4 |   Scheduling switch connection from input 2.0 to output 3.0.
+628 | network_0/router_4_4 | Beginning crossbar traversal for flit 944 from input 2.0 to output 3.0.
+628 | network_0/router_4_4 | Completed crossbar traversal for flit 944 from input 2.0 to output 3.0.
+628 | network_0/router_4_4 | Buffering flit 944 at output 3.
+628 | network_0/router_4_4 | Sending flit 944 to channel at output 3.
+629 | network_0/network_0_fchan_147 | Beginning channel traversal for flit 944 with delay 1.
+629 | network_0/network_0_fchan_147 | Completed channel traversal for flit 944.
+630 | network_0/router_3_4 | Received flit 944 from channel at input 2.
+630 | network_0/router_3_4 | Adding flit 944 to VC 1 at input 2 (state: active, empty).
+630 | network_0/router_3_4 | Beginning switch allocation for VC 1 at input 2 (front: 944).
+630 | network_0/router_3_4 |   Requesting output 3.0 (non-spec, pri: 0).
+630 | network_0/router_3_4/sw_allocator | Input requests = [ 2 -> [ 3@0 ]  3 -> [ 2@0 ]  ], output requests = [ 2 -> [ 3@0 ]  3 -> [ 2@0 ]  ].
+630 | network_0/router_3_4/sw_allocator | Input grants = [ 2 -> 3  3 -> 2  ], output grants = [ 2 -> 3  3 -> 2  ].
+630 | network_0/router_3_4 | Assigning output 3.0 to VC 1 at input 2.0.
+630 | network_0/router_3_4 | Completed switch allocation for VC 1 at input 2 (front: 944).
+630 | network_0/router_3_4 |   Scheduling switch connection from input 2.0 to output 3.0.
+631 | network_0/router_3_4 | Beginning crossbar traversal for flit 944 from input 2.0 to output 3.0.
+631 | network_0/router_3_4 | Completed crossbar traversal for flit 944 from input 2.0 to output 3.0.
+631 | network_0/router_3_4 | Buffering flit 944 at output 3.
+631 | network_0/router_3_4 | Sending flit 944 to channel at output 3.
+632 | network_0/network_0_fchan_115 | Beginning channel traversal for flit 944 with delay 1.
+632 | network_0/network_0_fchan_115 | Completed channel traversal for flit 944.
+633 | network_0/router_2_4 | Received flit 944 from channel at input 2.
+633 | network_0/router_2_4 | Adding flit 944 to VC 1 at input 2 (state: active, empty).
+633 | network_0/router_2_4 | Beginning switch allocation for VC 1 at input 2 (front: 944).
+633 | network_0/router_2_4 |   Requesting output 3.0 (non-spec, pri: 0).
+633 | network_0/router_2_4/sw_allocator | Input requests = [ 2 -> [ 3@0 ]  3 -> [ 2@0 ]  ], output requests = [ 2 -> [ 3@0 ]  3 -> [ 2@0 ]  ].
+633 | network_0/router_2_4/sw_allocator | Input grants = [ 2 -> 3  3 -> 2  ], output grants = [ 2 -> 3  3 -> 2  ].
+633 | network_0/router_2_4 | Assigning output 3.0 to VC 1 at input 2.0.
+633 | network_0/router_2_4 | Completed switch allocation for VC 1 at input 2 (front: 944).
+633 | network_0/router_2_4 |   Scheduling switch connection from input 2.0 to output 3.0.
+634 | network_0/router_2_4 | Beginning crossbar traversal for flit 944 from input 2.0 to output 3.0.
+634 | network_0/router_2_4 | Completed crossbar traversal for flit 944 from input 2.0 to output 3.0.
+634 | network_0/router_2_4 | Buffering flit 944 at output 3.
+634 | network_0/router_2_4 | Sending flit 944 to channel at output 3.
+635 | network_0/network_0_fchan_83 | Beginning channel traversal for flit 944 with delay 1.
+635 | network_0/network_0_fchan_83 | Completed channel traversal for flit 944.
+636 | network_0/router_1_4 | Received flit 944 from channel at input 2.
+636 | network_0/router_1_4 | Adding flit 944 to VC 1 at input 2 (state: active, empty).
+636 | network_0/router_1_4 | Beginning switch allocation for VC 1 at input 2 (front: 944).
+636 | network_0/router_1_4 |   VC 1 at output 3 is full.
+636 | network_0/router_1_4 | Completed switch allocation for VC 1 at input 2 (front: 944).
+636 | network_0/router_1_4 |   No output port allocated.
+637 | network_0/router_1_4 | Beginning switch allocation for VC 1 at input 2 (front: 944).
+637 | network_0/router_1_4 |   Requesting output 3.0 (non-spec, pri: 0).
+637 | network_0/router_1_4/sw_allocator | Input requests = [ 1 -> [ 2@0 ]  2 -> [ 3@0 ]  ], output requests = [ 2 -> [ 1@0 ]  3 -> [ 2@0 ]  ].
+637 | network_0/router_1_4/sw_allocator | Input grants = [ 1 -> 2  2 -> 3  ], output grants = [ 2 -> 1  3 -> 2  ].
+637 | network_0/router_1_4 | Assigning output 3.0 to VC 1 at input 2.0.
+637 | network_0/router_1_4 | Completed switch allocation for VC 1 at input 2 (front: 944).
+637 | network_0/router_1_4 |   Scheduling switch connection from input 2.0 to output 3.0.
+638 | network_0/router_1_4 | Beginning crossbar traversal for flit 944 from input 2.0 to output 3.0.
+638 | network_0/router_1_4 | Completed crossbar traversal for flit 944 from input 2.0 to output 3.0.
+638 | network_0/router_1_4 | Buffering flit 944 at output 3.
+638 | network_0/router_1_4 | Sending flit 944 to channel at output 3.
+639 | network_0/network_0_fchan_51 | Beginning channel traversal for flit 944 with delay 1.
+639 | network_0/network_0_fchan_51 | Completed channel traversal for flit 944.
+640 | network_0/router_0_4 | Received flit 944 from channel at input 2.
+640 | network_0/router_0_4 | Adding flit 944 to VC 1 at input 2 (state: active, front: 937).
+654 | network_0/router_0_4 | Beginning switch allocation for VC 1 at input 2 (front: 944).
+654 | network_0/router_0_4 |   Requesting output 4.0 (non-spec, pri: 0).
+654 | network_0/router_0_4/sw_allocator | Input requests = [ 0 -> [ 1@0 ]  1 -> [ 4@0 ]  2 -> [ 4@0 ]  ], output requests = [ 1 -> [ 0@0 ]  4 -> [ 1@0 2@0 ]  ].
+654 | network_0/router_0_4/sw_allocator | Input grants = [ 0 -> 1  1 -> 4  ], output grants = [ 1 -> 0  4 -> 1  ].
+654 | network_0/router_0_4 | Switch allocation failed for VC 1 at input 2: No output granted.
+654 | network_0/router_0_4 | Completed switch allocation for VC 1 at input 2 (front: 944).
+654 | network_0/router_0_4 |   No output port allocated.
+655 | network_0/router_0_4 | Beginning switch allocation for VC 1 at input 2 (front: 944).
+655 | network_0/router_0_4 |   Requesting output 4.0 (non-spec, pri: 0).
+655 | network_0/router_0_4/sw_allocator | Input requests = [ 0 -> [ 1@0 ]  1 -> [ 4@0 ]  2 -> [ 4@0 ]  ], output requests = [ 1 -> [ 0@0 ]  4 -> [ 1@0 2@0 ]  ].
+655 | network_0/router_0_4/sw_allocator | Input grants = [ 0 -> 1  2 -> 4  ], output grants = [ 1 -> 0  4 -> 2  ].
+655 | network_0/router_0_4 | Assigning output 4.0 to VC 1 at input 2.0.
+655 | network_0/router_0_4 | Completed switch allocation for VC 1 at input 2 (front: 944).
+655 | network_0/router_0_4 |   Scheduling switch connection from input 2.0 to output 4.0.
+656 | network_0/router_0_4 | Beginning crossbar traversal for flit 944 from input 2.0 to output 4.0.
+656 | network_0/router_0_4 | Completed crossbar traversal for flit 944 from input 2.0 to output 4.0.
+656 | network_0/router_0_4 | Buffering flit 944 at output 4.
+656 | network_0/router_0_4 | Sending flit 944 to channel at output 4.
+657 | network_0/network_0_fchan_egress4 | Beginning channel traversal for flit 944 with delay 1.
+657 | network_0/network_0_fchan_egress4 | Completed channel traversal for flit 944.
+658 | node4 | Ejecting flit 944 (packet 12) from VC 1.
+658 | node4 | Injecting credit for VC 1 into subnet 0.
+658 | node4 | Retiring flit 944 (packet 12, src = 62, dest = -1, hops = 10, flat = 113).

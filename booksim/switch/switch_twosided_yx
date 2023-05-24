@@ -1,0 +1,56 @@
+// Topology
+//topology = anynet;
+//network_file = switch_mesh8x8;
+topology = mesh;
+k = 8;
+n = 2;
+channel_width = 64;
+
+// Two-sided
+injection_nodes = {0,1,2,3,4,5,6,7,56,57,58,59,60,61,62,63};
+
+// Routing
+routing_function = dim_order;
+
+// Flow control
+num_vcs     = 2;
+vc_buf_size = 10;
+wait_for_tail_credit = 0;
+
+// Router architecture
+routing_delay  = 0;
+speculative = 1;
+
+// Traffic characteristics
+//traffic = randperm;
+//traffic = stress;
+//traffic = uniform;
+traffic = custom;
+
+packet_size={{8,16,32,48,64,80,96,112,128,188}};
+//packet_size={{4,8,16,24,32,40,48,56,64,94}};
+packet_size_rate={{1,4,8,12,25,25,12,8,4,1}};
+
+//packet_size={{8,16,32,48,64,80,112,128,160,188}};
+//packet_size={{4,8,16,24,32,40,56,64,80,94}};
+//packet_size_rate={{35,7,6,6,3,17,1,1,2,22}};
+
+injection_rate_uses_flits = 1;
+injection_rate = 0.16875; // 10 Gbps
+//injection_rate = 0.6750; // 40 Gbps, 64b flits
+//injection_rate = 0.3375; // 40 Gbps, 128b flits
+
+//injection_process = on_off;
+//burst_alpha = 0.4;
+//burst_beta = 0.6;
+
+latency_thres = 10000.0;
+
+// Simulation
+sim_type = latency;
+stats_out = stats.txt;
+pair_stats = 1;
+//print_activity = 1;
+
+watch_out = flit_watch.txt;
+watch_flits = {944};
